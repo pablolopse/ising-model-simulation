@@ -12,23 +12,23 @@
       DATA L_values /16, 32, 64, 128/
 
       ! Abrir un fichero por cada tipo de simulacion
-      ! open(10, File='metropolis_2d.txt')
-      ! open(11, File='glauber_2d.txt')
+      open(10, File='metropolis_2d.txt')
+      open(11, File='glauber_2d.txt')
       open(12, File='wolff_2d.txt')
 
       do iL = 1, 4
         L = L_values(iL)
         print*, 'L =', L
-        ! print*, '  Metropolis...'
-        ! call RUN_METROPOLIS(L, 10)
-        ! print*, '  Glauber...'
-        ! call RUN_GLAUBER(L, 11)
+        print*, '  Metropolis...'
+        call RUN_METROPOLIS(L, 10)
+        print*, '  Glauber...'
+        call RUN_GLAUBER(L, 11)
         print*, '  Wolff...'
         call RUN_WOLFF(L, 12)
       end do
 
-      ! close(10)
-      ! close(11)
+      close(10)
+      close(11)
       close(12)
 
       END PROGRAM
@@ -76,26 +76,44 @@
       !  Paso grueso 0.1 fuera de [2.2, 2.3]
       !  Paso fino   0.001 dentro de [2, 2.5]
       ! ===========================================
-      SUBROUTINE BUILD_TEMPS(temps, NTEMPS)
+      SUBROUTINE BUILD_TEMPS(temps, NTEMPS, L)
       IMPLICIT NONE
-      INTEGER NTEMPS, it
-      REAL*8 temps(200)
+      INTEGER NTEMPS, L
+      REAL*8 temps(2000), T_min, T_max, Tc, t
+      INTEGER i, j
+      REAL*8 temp_val
+
+      Tc = 2.269d0
+      T_min = Tc - 2.0d0 / dble(L)
+      T_max = Tc + 3.0d0 / dble(L)
 
       NTEMPS = 0
-      ! Grueso alto: 5.0, 4.8, ..., 2.3
-      do it = 0, 27
+
+      ! High temperatures: 5.0 down to T_max (step 0.1)
+      t = 5.0d0
+      do while (t .ge. T_max + 0.05d0)
         NTEMPS = NTEMPS + 1
-        temps(NTEMPS) = 5.0d0 - it*0.1d0
+        temps(NTEMPS) = t
+        t = t - 0.1d0
       end do
-      ! Fino: 2.29,...,2.21
-      do it = 0,8
+
+      ! Fine temperatures: T_max down to T_min (step 0.005)
+      ! Start from the first multiple of 0.005 <= T_max
+      t = T_max
+      do while (t .ge. T_min - 0.0025d0)
         NTEMPS = NTEMPS + 1
-        temps(NTEMPS) = 2.29d0 - it*0.01d0
+        temps(NTEMPS) = t
+        t = t - 0.005d0
       end do
-      ! Grueso bajo: 2.2,...,0.2
-      do it = 0, 20
+
+      ! Low temperatures: T_min down to 0.2 (step 0.1)
+      ! Start from the first multiple of 0.1 <= T_min
+      t = int(T_min * 10.0d0) / 10.0d0
+      if (t .gt. T_min - 0.001d0) t = t - 0.1d0
+      do while (t .ge. 0.15d0)
         NTEMPS = NTEMPS + 1
-        temps(NTEMPS) = 2.2d0 - it*0.1d0
+        temps(NTEMPS) = t
+        t = t - 0.1d0
       end do
 
       END SUBROUTINE
@@ -111,13 +129,17 @@
       INTEGER, ALLOCATABLE :: matrix(:,:)
       REAL*8 exponentials(0:DIM), E, M
       REAL*8 avg_e, avg_m, avg_e2, avg_m2, avg_m4
-      REAL*8 temps(200), T
+      REAL*8 temps(2000), T, Tc, T_min, T_max
       INTEGER NTEMPS, STEPS, NSKIP, NAVG, i, j, k
 
       N = L*L
       ALLOCATE(matrix(L,L))
 
-      call BUILD_TEMPS(temps, NTEMPS)
+      Tc = 2.269d0
+      T_min = Tc - 2.0d0 / dble(L)
+      T_max = Tc + 3.0d0 / dble(L)
+
+      call BUILD_TEMPS(temps, NTEMPS, L)
       call INITIALIZE(matrix, L, E, M, JMAG)
 
       do i = 1, NTEMPS
@@ -125,7 +147,7 @@
         print*,T
 
         ! Mas pasos cerca de Tc para reducir ruido
-        if (T.ge.2.2d0 .and. T.le.2.3d0) then
+        if (T.ge.2.0d0 .and. T.le.2.5d0) then
           STEPS = 2000000
           NSKIP = 600000
         else
@@ -234,13 +256,17 @@
       INTEGER, ALLOCATABLE :: matrix(:,:)
       REAL*8 exponentials(-DIM:DIM), E, M
       REAL*8 avg_e, avg_m, avg_e2, avg_m2, avg_m4
-      REAL*8 temps(200), T
+      REAL*8 temps(2000), T, Tc, T_min, T_max
       INTEGER NTEMPS, STEPS, NSKIP, NAVG, i, j, k
 
       N = L*L
       ALLOCATE(matrix(L,L))
 
-      call BUILD_TEMPS(temps, NTEMPS)
+      Tc = 2.269d0
+      T_min = Tc - 2.0d0 / dble(L)
+      T_max = Tc + 3.0d0 / dble(L)
+
+      call BUILD_TEMPS(temps, NTEMPS, L)
       call INITIALIZE(matrix, L, E, M, JMAG)
 
       do i = 1, NTEMPS
@@ -347,12 +373,12 @@
       IMPLICIT NONE
       INTEGER L, iunit, N, DIM, JMAG, STEPS, NSKIP, NAVG
       INTEGER STEPS_MAX
-      PARAMETER(DIM=2, JMAG=1, STEPS_MAX=200000)
+      PARAMETER(DIM=2, JMAG=1, STEPS_MAX=2000000)
       INTEGER, ALLOCATABLE :: matrix(:,:)
       REAL*8, ALLOCATABLE :: energies(:), mags(:)
       REAL*8 E, M, padd, avg_e, avg_m, avg_e2
       REAL*8 avg_m2, avg_m4
-      REAL*8 temps(200), T
+      REAL*8 temps(2000), T, Tc, T_min, T_max
       INTEGER NTEMPS, i, j, csize, flipped
       INTEGER, ALLOCATABLE :: stack_i(:), stack_j(:)
       INTEGER, ALLOCATABLE :: clust_i(:), clust_j(:)
@@ -365,16 +391,20 @@
       ALLOCATE(clust_i(N), clust_j(N))
       ALLOCATE(visited(L,L))
 
-      call BUILD_TEMPS(temps, NTEMPS)
+      Tc = 2.269d0
+      T_min = Tc - 2.0d0 / dble(L)
+      T_max = Tc + 3.0d0 / dble(L)
+
+      call BUILD_TEMPS(temps, NTEMPS, L)
       call INITIALIZE(matrix, L, E, M, JMAG)
 
       do i = 1, NTEMPS
         T = temps(i)
         print*,T
         ! Mas pasos cerca de Tc para reducir ruido
-        if (T.ge.2.2d0 .and. T.le.2.3d0) then
-          STEPS = 200000
-          NSKIP = 60000
+        if (T.ge.2.0d0 .and. T.le.2.5d0) then
+          STEPS = 2000000
+          NSKIP = 600000
         else
           STEPS = 20000
           NSKIP = 6000
@@ -412,7 +442,7 @@
         avg_m4 = 0
         NAVG = 0
         do j = NSKIP+1, STEPS
-          if (mod(j,50).eq.0) then
+          if (mod(j,5).eq.0) then
             avg_e = avg_e + energies(j)
             avg_m = avg_m + abs(mags(j))
             avg_e2 = avg_e2 + (energies(j)**2)
