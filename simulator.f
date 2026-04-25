@@ -128,12 +128,20 @@
       PARAMETER(DIM=2, JMAG=1)
       INTEGER, ALLOCATABLE :: matrix(:,:)
       REAL*8 exponentials(0:DIM), E, M
-      REAL*8 avg_e, avg_m, avg_e2, avg_m2, avg_m4
+      REAL*8 avg_e, avg_m, avg_e2, avg_m2, avg_m4, avg_mk2
+      REAL*8 mk_re, mk_im, pi
+      REAL*8, ALLOCATABLE :: cos_tab(:), sin_tab(:)
       REAL*8 temps(2000), T, Tc, T_min, T_max
-      INTEGER NTEMPS, STEPS, NSKIP, NAVG, i, j, k
+      INTEGER NTEMPS, STEPS, NSKIP, NAVG, i, j, k, ix, iy
 
       N = L*L
       ALLOCATE(matrix(L,L))
+      pi = 4.0d0 * atan(1.0d0)
+      ALLOCATE(cos_tab(L), sin_tab(L))
+      do ix = 1, L
+        cos_tab(ix) = cos(2.0d0*pi*dble(ix)/dble(L))
+        sin_tab(ix) = sin(2.0d0*pi*dble(ix)/dble(L))
+      end do
 
       Tc = 2.269d0
       T_min = Tc - 2.0d0 / dble(L)
@@ -166,6 +174,7 @@
         avg_e2 = 0
         avg_m2 = 0
         avg_m4 = 0
+        avg_mk2 = 0
         do j = 1, STEPS
           call METROPOLIS_MC_STEP(matrix, L, E, M,
      &                           N, DIM, exponentials)
@@ -175,6 +184,16 @@
             avg_e2 = avg_e2 + E**2
             avg_m2 = avg_m2 + (M/N)**2
             avg_m4 = avg_m4 + (M/N)**4
+            mk_re = 0.0d0
+            mk_im = 0.0d0
+            do iy = 1, L
+              do ix = 1, L
+                mk_re = mk_re + matrix(ix,iy)*cos_tab(ix)
+                mk_im = mk_im + matrix(ix,iy)*sin_tab(ix)
+              end do
+            end do
+            avg_mk2 = avg_mk2 +
+     &        (mk_re**2+mk_im**2)/dble(N)**2
             NAVG = NAVG + 1
           end if
         end do
@@ -182,10 +201,11 @@
      &    avg_m/NAVG/N,
      &    (avg_e2/NAVG - (avg_e/NAVG)**2)
      &    /(N*T**2),
-     &    avg_m2/NAVG, avg_m4/NAVG
+     &    avg_m2/NAVG, avg_m4/NAVG, avg_mk2/NAVG
       end do
 
       DEALLOCATE(matrix)
+      DEALLOCATE(cos_tab, sin_tab)
 
       END SUBROUTINE
 
@@ -255,12 +275,20 @@
       PARAMETER(DIM=2, JMAG=1)
       INTEGER, ALLOCATABLE :: matrix(:,:)
       REAL*8 exponentials(-DIM:DIM), E, M
-      REAL*8 avg_e, avg_m, avg_e2, avg_m2, avg_m4
+      REAL*8 avg_e, avg_m, avg_e2, avg_m2, avg_m4, avg_mk2
+      REAL*8 mk_re, mk_im, pi
+      REAL*8, ALLOCATABLE :: cos_tab(:), sin_tab(:)
       REAL*8 temps(2000), T, Tc, T_min, T_max
-      INTEGER NTEMPS, STEPS, NSKIP, NAVG, i, j, k
+      INTEGER NTEMPS, STEPS, NSKIP, NAVG, i, j, k, ix, iy
 
       N = L*L
       ALLOCATE(matrix(L,L))
+      pi = 4.0d0 * atan(1.0d0)
+      ALLOCATE(cos_tab(L), sin_tab(L))
+      do ix = 1, L
+        cos_tab(ix) = cos(2.0d0*pi*dble(ix)/dble(L))
+        sin_tab(ix) = sin(2.0d0*pi*dble(ix)/dble(L))
+      end do
 
       Tc = 2.269d0
       T_min = Tc - 2.0d0 / dble(L)
@@ -292,6 +320,7 @@
         avg_e2 = 0
         avg_m2 = 0
         avg_m4 = 0
+        avg_mk2 = 0
         do j = 1, STEPS
           call GLAUBER_MC_STEP(matrix, L, E, M,
      &                        N, DIM, exponentials)
@@ -301,6 +330,16 @@
             avg_e2 = avg_e2 + E**2
             avg_m2 = avg_m2 + (M/N)**2
             avg_m4 = avg_m4 + (M/N)**4
+            mk_re = 0.0d0
+            mk_im = 0.0d0
+            do iy = 1, L
+              do ix = 1, L
+                mk_re = mk_re + matrix(ix,iy)*cos_tab(ix)
+                mk_im = mk_im + matrix(ix,iy)*sin_tab(ix)
+              end do
+            end do
+            avg_mk2 = avg_mk2 +
+     &        (mk_re**2+mk_im**2)/dble(N)**2
             NAVG = NAVG + 1
           end if
         end do
@@ -308,10 +347,11 @@
      &    avg_m/NAVG/N,
      &    (avg_e2/NAVG - (avg_e/NAVG)**2)
      &    /(N*T**2),
-     &    avg_m2/NAVG, avg_m4/NAVG
+     &    avg_m2/NAVG, avg_m4/NAVG, avg_mk2/NAVG
       end do
 
       DEALLOCATE(matrix)
+      DEALLOCATE(cos_tab, sin_tab)
 
       END SUBROUTINE
 
@@ -377,9 +417,11 @@
       INTEGER, ALLOCATABLE :: matrix(:,:)
       REAL*8, ALLOCATABLE :: energies(:), mags(:)
       REAL*8 E, M, padd, avg_e, avg_m, avg_e2
-      REAL*8 avg_m2, avg_m4
+      REAL*8 avg_m2, avg_m4, avg_mk2
+      REAL*8 mk_re, mk_im, pi
+      REAL*8, ALLOCATABLE :: cos_tab(:), sin_tab(:)
       REAL*8 temps(2000), T, Tc, T_min, T_max
-      INTEGER NTEMPS, i, j, csize, flipped
+      INTEGER NTEMPS, i, j, csize, flipped, ix, iy
       INTEGER, ALLOCATABLE :: stack_i(:), stack_j(:)
       INTEGER, ALLOCATABLE :: clust_i(:), clust_j(:)
       INTEGER, ALLOCATABLE :: visited(:,:)
@@ -390,6 +432,12 @@
       ALLOCATE(stack_i(N), stack_j(N))
       ALLOCATE(clust_i(N), clust_j(N))
       ALLOCATE(visited(L,L))
+      pi = 4.0d0 * atan(1.0d0)
+      ALLOCATE(cos_tab(L), sin_tab(L))
+      do ix = 1, L
+        cos_tab(ix) = cos(2.0d0*pi*dble(ix)/dble(L))
+        sin_tab(ix) = sin(2.0d0*pi*dble(ix)/dble(L))
+      end do
 
       Tc = 2.269d0
       T_min = Tc - 2.0d0 / dble(L)
@@ -416,6 +464,7 @@
         end if
         
         padd = 1.0d0 - exp(-2.0d0/T)
+        avg_mk2 = 0.0d0
 
         energies(1:STEPS) = 0
         mags(1:STEPS) = 0
@@ -433,6 +482,18 @@
           end do
           energies(j) = E
           mags(j) = M
+          if (j.gt.NSKIP .and. mod(j,5).eq.0) then
+            mk_re = 0.0d0
+            mk_im = 0.0d0
+            do iy = 1, L
+              do ix = 1, L
+                mk_re = mk_re + matrix(ix,iy)*cos_tab(ix)
+                mk_im = mk_im + matrix(ix,iy)*sin_tab(ix)
+              end do
+            end do
+            avg_mk2 = avg_mk2 +
+     &        (mk_re**2+mk_im**2)/dble(N)**2
+          end if
         end do
 
         avg_e = 0
@@ -455,11 +516,12 @@
      &    avg_m/NAVG/N,
      &    (avg_e2/NAVG - (avg_e/NAVG)**2)
      &    /(N*T**2),
-     &    avg_m2/NAVG, avg_m4/NAVG
+     &    avg_m2/NAVG, avg_m4/NAVG, avg_mk2/NAVG
       end do
 
       DEALLOCATE(matrix, energies, mags)
       DEALLOCATE(stack_i, stack_j, clust_i, clust_j, visited)
+      DEALLOCATE(cos_tab, sin_tab)
 
       END SUBROUTINE
 
