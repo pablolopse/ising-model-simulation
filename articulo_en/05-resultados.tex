@@ -1,0 +1,154 @@
+\chapter{Results and discussion} \label{chap:resultados}
+This chapter presents the numerical results of the simulations described above and compares them with theoretical expectations. For each observable we first show the raw data for each size and algorithm and then perform the appropriate analysis, either qualitative or via FSS. The chapter closes with the dynamical comparison using integrated autocorrelation times, where the most significant differences between local and cluster dynamics — and between Metropolis and Glauber — appear.
+
+\section{Heat capacity and magnetisation}
+
+Figures \ref{fig:c} and \ref{fig:m} display the heat capacity $c$ and the mean absolute magnetisation $\langle|m|\rangle$ as functions of $T$ for the three algorithms and four lattice sizes.
+
+\begin{figure}
+  \centering
+  \includesvg[width=\textwidth]{figs/c.svg}
+  \caption{Heat capacity vs temperature for the three algorithms and $L\in\{16,32,64,128\}$. The peak of $c$ sharpens and moves toward $T_c$ as $L$ increases.}
+  \label{fig:c}
+\end{figure}
+\begin{figure}
+  \centering
+  \includesvg[width=\textwidth]{figs/m.svg}
+  \caption{Mean magnetisation per spin as a function of temperature for the three algorithms and $L\in\{16,32,64,128\}$.}
+  \label{fig:m}
+\end{figure}
+
+As expected, the magnetisation per spin decreases smoothly (not abruptly) from values close to unity to nearly zero in the paramagnetic phase. This crossover sharpens with increasing $L$, approaching the discontinuous jump of the thermodynamic limit. The three algorithms yield almost identical results for these observables, which gives confidence that the Boltzmann ensemble has been sampled correctly. For the heat capacity the peak broadens and shifts to higher temperatures as $L$ decreases, consistent with theoretical expectations.
+
+One might attempt to estimate $T_c$ by following the shift of heat-capacity maxima, but because the divergence of $c$ in the 2D Ising model is only logarithmic, the peak height grows very slowly, making such extrapolations unreliable. This is a well-known difficulty and motivates the use of the Binder cumulant and the susceptibility in the FSS analysis.
+
+The mean absolute magnetisation matches theoretical predictions far from criticality. Close to $T_c$ the transition is rounded over a finite temperature window in finite systems, but the trend toward a sharper change with increasing $L$ is clearly visible.
+
+\section{Binder cumulant}
+
+The Binder cumulant $U_4$ is a direct observable to locate the critical temperature: curves for different $L$ should cross at $T_c$. In practice finite-size effects shift the crossings, so we use the linear-extrapolation method described in the text to estimate the $L\to\infty$ limit. Figure \ref{fig:u4} shows the Binder cumulant near $T_c$ and the extrapolated crossing temperatures obtained with this method.
+
+\begin{figure}
+  \centering
+    \includesvg[width=\textwidth]{figs/fss_binder.svg}
+    \caption{Binder cumulant for all algorithms and lattice sizes.}
+    \label{fig:u4}
+\end{figure}
+
+The universal value of the Binder cumulant at the crossing for the 2D Ising model with periodic boundary conditions is approximately $U_4^*\approx0.61$ \citep{Binder1981}. This value is independent of $L$ in the thermodynamic limit and provides an additional check: if simulation crossings occur near this value, the data are consistent with the expected universality class. In the figures the crossings indeed occur roughly at this value for all size pairs and algorithms, indicating the simulations and measurements are correct. Figure~\ref{fig:extrp_u4} shows the fitting lines for each algorithm together with the extrapolated $T_c$.
+
+\begin{figure}
+  \centering
+    \includesvg[width=\textwidth]{figs/extrp_lin.svg}
+    \caption{Extrapolation of $U_4$ crossing temperatures to the thermodynamic limit for each algorithm.}
+    \label{fig:extrp_u4}
+\end{figure}
+
+The finite-size correction to the crossing position scales as $L^{-1/\nu}=L^{-1}$ for the 2D Ising model, so doubling $L$ should halve the systematic shift and the sequence $T_c(L,2L)$ should converge smoothly to $T_c$. In Metropolis and Glauber the expected convergence is obscured by much larger statistical noise because their integrated autocorrelation times $\tau_{\mathrm{int}}$ grow strongly near criticality, while Wolff does not suffer from this effect. As a result systematic improvements with increasing $L$ are only evident for Wolff; Metropolis and Glauber data scatter more due to insufficient decorrelation.
+
+\section{Magnetic susceptibility}
+
+Figure \ref{fig:chi_bruta} shows the susceptibility $\chi$ for the three algorithms and four sizes. The peak height clearly grows with $L$ as expected from $\chi_{\max}\sim L^{\gamma/\nu}$ with $\gamma/\nu=7/4$, and the peak narrows and shifts slightly toward $T_c$, consistent with FSS predictions.
+
+\begin{figure}
+  \centering
+  \includesvg[width=\textwidth]{figs/suscept.svg}
+  \caption{Magnetic susceptibility $\chi$ vs $T$ for the three algorithms and $L\in\{16,32,64,128\}$. The peak height increases following $L^{\gamma/\nu}$.}
+  \label{fig:chi_bruta}
+\end{figure}
+
+We can quantify the growth of the peak with $L$ as an additional check. Extracting $\chi_{\max}(L)$ for each size and plotting $\ln\chi_{\max}$ vs $\ln L$ should yield a slope $\gamma/\nu=7/4\approx1.75$. The linear fits shown provide an independent verification of the power-law $\chi_{\max}\sim L^{\gamma/\nu}$.
+
+\begin{figure}
+  \centering
+  \includesvg[width=\textwidth]{figs/chi_scaling.svg}
+  \caption{Linear fit of $\ln\chi_{\max}$ vs $\ln L$ for the algorithms and the fitted slope.}
+  \label{fig:chi_scaling}
+\end{figure}
+
+\section{Finite-size scaling of the susceptibility}
+
+Figure \ref{fig:fss_suscept} shows the FSS collapse of the susceptibility using the experimentally obtained exponents for each algorithm.
+
+\begin{figure}
+  \centering
+  \includesvg[width=\textwidth]{figs/suscept_fss.svg}
+  \caption{FSS collapse of $\chi$ using experimental exponents for each algorithm.}
+  \label{fig:fss_suscept}
+\end{figure}
+
+The quality of the collapse is suboptimal in all cases. For Metropolis and Glauber the collapse may appear better but noisier for larger $L$, with their peaks roughly aligning near $x\approx1$. The Wolff peak, however, is noticeably shifted to about $x\approx1.5$. Since Wolff does not suffer critical slowing down, this discrepancy suggests that the runs for Metropolis and Glauber underestimated the number of steps needed to obtain effectively independent measurements, explaining the large differences between the local algorithms and Wolff.
+
+This demonstrates that local-update algorithms fail to produce fully decorrelated samples near $T_c$ even when the chosen thermalisation appears adequate. Section \ref{sec:tint} discusses this issue in more detail. Given the data quality, the extracted exponents are not highly precise for any algorithm.
+
+\section{Correlation length}
+
+Figure \ref{fig:xi} displays $\xi_L$ vs $T$ for each algorithm. Values remain below $L/4$ for all sizes, as expected for the second-moment definition in the ordered phase; this does not indicate a problem since the ratio of peak heights follows the ratio of $L$.
+
+\begin{figure}
+  \centering
+  \includesvg[width=\textwidth]{figs/xi_vs_T.svg}
+  \caption{Second-moment correlation length $\xi_L$ vs $T$ for each algorithm and $L\in\{16,32,64,128\}$. Peaks grow with $L$ and shift towards $T_c$.}
+  \label{fig:xi}
+\end{figure}
+
+The key quantity is the ratio $\xi_L/L$, shown in Fig.~\ref{fig:xi_ratio}. The curves cross near $T_c$, similarly to the Binder cumulant but based on a different observable: the coincidence of crossing points indicates that the correlation length scales linearly with system size at criticality.
+
+\begin{figure}
+  \centering
+  \includesvg[width=\textwidth]{figs/xi_ratio.svg}
+  \caption{Scaled correlation length $\xi_L/L$ vs $T$ for each algorithm and $L\in\{16,32,64,128\}$.}
+  \label{fig:xi_ratio}
+\end{figure}
+
+The fact that both $U_4$ and $\xi_L/L$ cross at approximately the same temperature is a non-trivial internal consistency check: these observables are constructed in very different ways (moments of magnetisation vs structure factor), yet point to the same $T_c$. Agreement of the three algorithms on the crossing further supports that equilibrium was sampled correctly. A linear fit to the maxima positions yields the exponent $1/\nu$, shown in Fig.~\ref{fig:xi_scaling}.
+
+\begin{figure}
+  \centering
+  \includesvg[width=\textwidth]{figs/xi_scaling.svg}
+  \caption{Linear fit of the correlation-length peak positions versus $L$ in log–log scale.}
+  \label{fig:xi_scaling}
+\end{figure}
+
+As expected, the fitted slope is close to one in all cases, indicating $\nu\approx1$.
+
+\subsection{FSS collapse of the correlation length}
+
+Figure \ref{fig:xi_fss} presents the FSS collapse of $\xi_L/L$ using the values of $\nu$ obtained from the collapse search for each algorithm.
+
+\begin{figure}
+  \centering
+  \includesvg[width=\textwidth]{figs/xi_fss.svg}
+  \caption{FSS collapse of $\xi_L/L$ with experimental exponents for each algorithm.}
+  \label{fig:xi_fss}
+\end{figure}
+
+The crossing visible in Fig.~\ref{fig:xi_ratio} becomes a collapse onto a common curve when plotted against $(T-T_c)L^{1/\nu}$, confirming $\nu=1$ without additional fitting. Nevertheless, the collapse of $\xi_L/L$ suffers from the same difficulties as the susceptibility: Metropolis and Glauber data become noisier for larger $L$, although a reasonable rescaling is still possible. For Wolff, despite cleaner curves, achieving a satisfactory collapse for any single $\nu$ value is challenging due to the observed systematic shifts.
+
+\newpage
+\section{Autocorrelation time} \label{sec:tint}
+
+The plots in Fig.~\ref{fig:tint} are among the most informative for the algorithmic comparison.
+
+\begin{figure}
+  \centering
+  \includesvg[width=\textwidth]{figs/tau_vs_T.svg}
+  \caption{Integrated autocorrelation time $\tau_{\mathrm{int}}$ vs $T$ for each algorithm and $L\in\{16,32,64,128\}$.}
+  \label{fig:tint}
+\end{figure}
+
+
+There is a striking distinction. Metropolis and Glauber clearly exhibit critical slowing down: the peak near $T_c$ grows with $L$ and is orders of magnitude larger for $L=128$ than for $L=16$. Moreover, Glauber peaks are consistently about $3/2$ times larger than Metropolis, reflecting the generally lower acceptance probabilities in Glauber and hence longer autocorrelation times. By contrast Wolff displays very small $\tau_{\mathrm{int}}$ (and larger statistical noise) across the range with only a tiny structure near $T_c$, directly illustrating that cluster algorithms essentially remove critical slowing down.
+
+
+This behaviour explains the discrepancies between Wolff and the local algorithms in the data collapses. For truly decorrelated sampling at $T_c$ Glauber would require taking measurements every $\sim9000$ MCS rather than every 50 MCS used here, so the measurements near criticality for the largest sizes are strongly correlated and the statistical errors are underestimated.
+
+
+By fitting the peak autocorrelation times to a power law $\tau_{\max}(L)\sim L^z$ one can estimate the dynamic exponent $z$. With four sizes the trend for Metropolis and Glauber is clearly increasing and consistent with $z\approx2$, although precise quantitative fits would require larger lattices and more samples to reduce statistical fluctuations. For Wolff estimating $z$ is harder because $\tau_{\mathrm{int}}$ is of order unity and noise dominates; the literature value $z\approx0.25$ \citep{Wolff1989} is difficult to distinguish from $z=0$ with our data. Practically, obtaining an effectively independent sample near $T_c$ costs orders of magnitude less with Wolff than with the local algorithms for the lattice sizes studied here. Figure \ref{fig:tint-scaling} shows the fitted results, which are reasonably close to theoretical expectations.
+
+\begin{figure}
+  \centering
+  \includesvg[width=\textwidth]{figs/tau_scaling.svg}
+  \caption{Logarithmic fit to estimate the dynamic exponent for each algorithm.}
+  \label{fig:tint-scaling}
+\end{figure}

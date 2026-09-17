@@ -1,0 +1,33 @@
+\chapter{Introducción}
+
+\section{Motivación}
+
+El estudio de las transiciones de fase es uno de los problemas principales de la física estadística. Una transición de fase ocurre cuando un sistema experimenta un cambio en sus propiedades macroscópicas al variar algún parámetro o efecto externo, como puede ser la temperatura. Estas se clasifican según el comportamiento de la energía libre y sus derivadas \citep{Stanley1971}: en las de primer orden hay una discontinuidad en la primera derivada, lo que da lugar a calor latente y coexistencia de fases, mientras que en las de segundo orden (o continuas) la primera derivada es continua y es la segunda la que diverge. En este trabajo nos vamos a centrar en una transición de segundo orden, donde el modelo de Ising resulta particularmente relevante.
+
+El modelo de Ising fue propuesto por Wilhelm Lenz en 1920 como un modelo sencillo para tratar de explicar el ferromagnetismo a su estudiante doctoral Ernst Ising, quien consiguió resolverlo analíticamente en dimensión $D=1$ en 1925 \citep{Ising1925}. La solución que obtuvo fue, en cierto modo, decepcionante: en una dimensión no aparecía ninguna transición de fase. Esto llevó a Ising a concluir, erróneamente, que tampoco la habría en dimensiones superiores, y que el modelo no podría reproducir los fenómenos observados experimentalmente.
+
+Hubo que esperar hasta 1944 para que Lars Onsager, con un cálculo de notable dificultad técnica, resolviera el modelo en dos dimensiones \citep{Onsager1944}. Con ello demostró que el modelo sí presentaba una transición de fase de segundo orden a temperatura finita \citep{Peierls1936}, de un estado ferromagnético a uno paramagnético, junto con los ingredientes y resultados característicos de este tipo de transiciones. Desde entonces el modelo se ha convertido en uno de los pilares de la mecánica estadística, precisamente por ser lo bastante sencillo como para admitir un tratamiento exacto y, a la vez, lo bastante rico como para mostrar un comportamiento complejo.
+
+En ausencia de campo magnético externo, el Hamiltoniano del modelo es
+\begin{equation}
+\mathcal{H} = -J \sum_{\langle i,j \rangle} \sigma_i \sigma_j,
+\label{eq:hamiltonian}
+\end{equation}
+con los espines $\sigma_i = \pm 1$ situados en los nodos de una red cuadrada, la suma extendida a los pares de primeros vecinos y $J > 0$ en el caso ferromagnético. Para la red cuadrada bidimensional, la solución de Onsager da también el valor exacto de la temperatura crítica,
+\begin{equation}
+T_c = \frac{2J}{k_B \ln(1+\sqrt{2})} \approx 2{,}2692\,\frac{J}{k_B},
+\label{eq:Tc_onsager}
+\end{equation}
+valor que se usará más adelante como referencia para los resultados de la simulación. Es justamente esta solución exacta lo que convierte al modelo en un sistema de prueba para algoritmos de simulación: si un método no es capaz de reproducir estos resultados aquí, no va a ser fiable en problemas donde no haya nada con lo que comparar.
+
+Desde entonces, el modelo ha sido utilizado para tratar de modelar o explicar comportamientos en áreas realmente diversas y muy alejadas de su propósito original, desde la biología hasta las finanzas. Dado este interés en su aplicación, en este estudio se explican y desarrollan las principales técnicas de simulación que existen para obtener soluciones numéricas del modelo mediante simulaciones Montecarlo, los parámetros o valores de interés que se pueden extraer de ellas, y una comparativa de las ventajas e inconvenientes de cada una de las técnicas empleadas.
+
+\section{Objetivos}
+El objetivo del trabajo es la comparación completa de tres de los algoritmos más utilizados en simulaciones Montecarlo, aplicados al modelo de Ising bidimensional en red cuadrada y sin campo magnético externo, para tamaños de red $L \in \{16, 32, 64, 128\}$. Para ello se desarrollan tres programas en Fortran que implementan los algoritmos de Metropolis \citep{Metropolis1953}, Glauber \citep{Glauber1963} y Wolff \citep{Wolff1989}. Para comprobar que los tres funcionan correctamente y poder compararlos entre sí, con las simulaciones se calculan las magnitudes más relevantes del sistema: la magnetización media $\langle|m|\rangle$, la capacidad calorífica por partícula $c$ (de aquí en adelante, toda referencia a capacidad calorífica será por partícula aunque no se indique explícitamente), la susceptibilidad magnética $\chi$, el cumulante de Binder $U_4$ y la longitud de correlación $\xi_L$. Todo esto se hace mediante un barrido de temperaturas y de tamaños de red.
+
+El barrido en temperaturas sirve para estudiar con más detalle el comportamiento del sistema en torno a la transición de fase, que ocurre alrededor de la llamada temperatura crítica $T_c$ (cuyo valor exacto según Onsager es $T_c \approx 2{,}2692\,J/k_B$, ecuación \eqref{eq:Tc_onsager}) para cada una de las magnitudes estudiadas. El barrido en tamaños, por su parte, permite varias cosas: ver cómo dependen las magnitudes del tamaño de la red para aproximar su valor en el límite de tamaño infinito u obtener los exponentes críticos asociados a la clase de universalidad del modelo de Ising aplicando la técnica del escalado de tamaño finito.
+
+Finalmente, se mide también el tiempo de autocorrelación integrado. Esto no es una magnitud física del sistema propiamente dicho, sino una cantidad asociada a la propia simulación, y permite una comparación adicional entre los tres algoritmos, sobre todo en términos de su eficiencia cerca del punto crítico.
+
+\subsection*{Estructura de la memoria}
+La memoria se organiza como sigue. El capítulo~\ref{chap:teoria} recoge el fundamento teórico necesario para entender el modelo, la transición de fase que presenta y el método Montecarlo, incluyendo la explicación de los tres algoritmos empleados. El capítulo~\ref{chap:metodos} describe el modelo simulado y los parámetros de la simulación. Los resultados se presentan y discuten en el capítulo~\ref{chap:resultados}, y las conclusiones en el capítulo~\ref{chap:conclusiones}.

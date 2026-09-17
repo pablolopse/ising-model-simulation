@@ -1,0 +1,101 @@
+\begin{thebibliography}{}
+
+\bibitem[Binder, 1981]{Binder1981}
+Binder, K. (1981).
+\newblock Finite size scaling analysis of {Ising} model block distribution
+  functions.
+\newblock {\em Zeitschrift f{\"u}r Physik B Condensed Matter}, 43(2):119--140.
+
+\bibitem[Cooper et~al., 1982]{Cooper1982}
+Cooper, F., Freedman, B., y Preston, D. (1982).
+\newblock Solving $\phi^4_1$ field theory with {Monte Carlo}.
+\newblock {\em Nuclear Physics B}, 210(2):210--228.
+
+\bibitem[Fisher y Barber, 1972]{Fisher1972}
+Fisher, M.~E. y Barber, M.~N. (1972).
+\newblock Scaling theory for finite-size effects in the critical region.
+\newblock {\em Physical Review Letters}, 28(23):1516--1519.
+
+\bibitem[Glauber, 1963]{Glauber1963}
+Glauber, R.~J. (1963).
+\newblock Time-dependent statistics of the {Ising} model.
+\newblock {\em Journal of Mathematical Physics}, 4(2):294--307.
+
+\bibitem[Hohenberg y Halperin, 1977]{HohenbergHalperin1977}
+Hohenberg, P.~C. y Halperin, B.~I. (1977).
+\newblock Theory of dynamic critical phenomena.
+\newblock {\em Reviews of Modern Physics}, 49(3):435--479.
+
+\bibitem[Ising, 1925]{Ising1925}
+Ising, E. (1925).
+\newblock Beitrag zur {Theorie} des {Ferromagnetismus}.
+\newblock {\em Zeitschrift f{\"u}r Physik}, 31(1):253--258.
+
+\bibitem[Landau y Binder, 2014]{LandauBinder}
+Landau, D.~P. y Binder, K. (2014).
+\newblock {\em A Guide to {Monte Carlo} Simulations in Statistical Physics}.
+\newblock Cambridge University Press, Cambridge, 4 edition.
+
+\bibitem[Madras y Sokal, 1988]{Madras1988}
+Madras, N. y Sokal, A.~D. (1988).
+\newblock The pivot algorithm: a highly efficient {Monte Carlo} method for the
+  self-avoiding walk.
+\newblock {\em Journal of Statistical Physics}, 50(1--2):109--186.
+
+\bibitem[Metropolis et~al., 1953]{Metropolis1953}
+Metropolis, N., Rosenbluth, A.~W., Rosenbluth, M.~N., Teller, A.~H., y Teller,
+  E. (1953).
+\newblock Equation of state calculations by fast computing machines.
+\newblock {\em The Journal of Chemical Physics}, 21(6):1087--1092.
+
+\bibitem[Newman y Barkema, 1999]{Newman1999}
+Newman, M. E.~J. y Barkema, G.~T. (1999).
+\newblock {\em Monte Carlo Methods in Statistical Physics}.
+\newblock Oxford University Press, Oxford.
+
+\bibitem[Onsager, 1944]{Onsager1944}
+Onsager, L. (1944).
+\newblock Crystal statistics. {I}. {A} two-dimensional model with an
+  order-disorder transition.
+\newblock {\em Physical Review}, 65(3--4):117--149.
+
+\bibitem[Peierls, 1936]{Peierls1936}
+Peierls, R. (1936).
+\newblock On {Ising}'s model of ferromagnetism.
+\newblock {\em Mathematical Proceedings of the Cambridge Philosophical
+  Society}, 32(3):477--481.
+
+\bibitem[Sokal, 1997]{Sokal1997}
+Sokal, A.~D. (1997).
+\newblock {Monte Carlo} methods in statistical mechanics: foundations and new
+  algorithms.
+\newblock En DeWitt-Morette, C., Cartier, P., y Folacci, A., editores, {\em
+  Functional Integration: Basics and Applications}, pages 131--192. Plenum
+  Press, New York.
+
+\bibitem[Stanley, 1971]{Stanley1971}
+Stanley, H.~E. (1971).
+\newblock {\em Introduction to Phase Transitions and Critical Phenomena}.
+\newblock Oxford University Press, Oxford.
+
+\bibitem[Swendsen y Wang, 1987]{SwendsenWang1987}
+Swendsen, R.~H. y Wang, J.-S. (1987).
+\newblock Nonuniversal critical dynamics in {Monte Carlo} simulations.
+\newblock {\em Physical Review Letters}, 58(2):86--88.
+
+\bibitem[Wilson, 1974]{Wilson1974}
+Wilson, K.~G. (1974).
+\newblock The renormalization group and the $\epsilon$ expansion.
+\newblock {\em Physics Reports}, 12(2):75--199.
+
+\bibitem[Wolff, 1989]{Wolff1989}
+Wolff, U. (1989).
+\newblock Collective {Monte Carlo} updating for spin systems.
+\newblock {\em Physical Review Letters}, 62(4):361--364.
+
+\bibitem[Yang, 1952]{Yang1952}
+Yang, C.-N. (1952).
+\newblock The spontaneous magnetization of a two-dimensional {Ising} model.
+\newblock {\em Physical Review}, 85(5):808--816.
+
+\end{thebibliography}

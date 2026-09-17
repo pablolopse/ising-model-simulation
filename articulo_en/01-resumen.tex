@@ -1,0 +1,17 @@
+\section*{Abstract}
+
+The Ising model is one of the paradigmatic systems in statistical mechanics, notable for the wide range of phenomena it displays despite its simple definition: a ferromagnetic–paramagnetic phase transition in 2D, the divergence of the correlation length at the critical temperature $T_c$, universality and critical exponents, and related phenomena such as hysteresis under applied fields.
+
+In this work we study the two-dimensional Ising model using Monte Carlo simulations and compare three update algorithms: Metropolis, Glauber and Wolff. Each algorithm has advantages and limitations; the comparison aims to clarify which algorithm is preferable under different simulation regimes.
+
+Simulations were performed on square lattices with side lengths $L\in\{16,32,64,128\}$ and periodic boundary conditions, using $J=1$ and temperature measured in units of $J/k_B$. For each size and temperature we collected sufficiently many samples after thermalization to estimate the observables of interest: the mean magnetization per spin $\langle|m|\rangle$, the heat capacity $C$, the magnetic susceptibility $\chi$, the fourth-order Binder cumulant $U_4$, and the second-moment correlation length $\xi_L$.
+
+Critical exponents were estimated via finite-size scaling (FSS): if data are rescaled with the proper powers of $L$, curves for different sizes should collapse onto a single universal curve. We use visual collapse of $\chi$ and $\xi_L$ to obtain approximate exponent values.
+
+The Binder cumulant is scale-invariant and its crossings for different $L$ provide an independent estimate of $T_c$ without fitting exponents; we use this as a complementary method to reduce finite-size bias.
+
+Algorithmic efficiency is assessed through the integrated autocorrelation time $\tau_{\mathrm{int}}$, computed with the Madras–Sokal windowing estimator \citep{Madras1988}. Metropolis and Glauber show critical slowing down near $T_c$ (large $\tau_{\mathrm{int}}$), while the Wolff cluster algorithm effectively eliminates this slowdown and yields very small autocorrelation times across the temperature range.
+
+The numerical results agree with theoretical expectations (Onsager's $T_c$ and known critical exponents) and illustrate the trade-offs between algorithms in terms of accuracy and computational cost.
+
+\textbf{Keywords:} Ising model, Monte Carlo, Metropolis, Glauber, Wolff, phase transition, finite-size scaling, critical exponents, critical temperature, critical slowing down.

@@ -1,0 +1,24 @@
+\chapter{Introduction}
+
+\section{Motivation}
+
+Phase transitions are a central topic in statistical physics. A phase transition occurs when a system undergoes a change in its macroscopic properties as an external parameter, such as temperature, is varied. They are classified according to the behaviour of the free energy and its derivatives \citep{Stanley1971}: first-order transitions exhibit a discontinuity in the first derivative (latent heat and phase coexistence), while second-order (continuous) transitions show diverging second derivatives. This work focuses on a second-order transition, where the Ising model plays a paradigmatic role.
+
+The Ising model was introduced by Wilhelm Lenz in 1920 and studied by Ernst Ising, who solved the one-dimensional case in 1925 \citep{Ising1925}. The absence of a phase transition in one dimension initially suggested that the model might be trivial in higher dimensions, but Lars Onsager's exact solution for the two-dimensional model in 1944 demonstrated a finite-temperature second-order transition \citep{Onsager1944,Peierls1936}. The exact result for the square-lattice critical temperature is
+\begin{equation}
+T_c = \frac{2J}{k_B \ln(1+\sqrt{2})} \approx 2{,}2692\,\frac{J}{k_B},
+\label{eq:Tc_onsager}
+\end{equation}
+which we use as a reference for our numerical estimates. The availability of an exact benchmark makes the 2D Ising model an ideal testbed for validating simulation algorithms.
+
+Beyond magnetism, the Ising model and its variants serve as minimal models for collective phenomena in diverse fields, from biology to social science. Given this broad relevance, this study develops and compares common Monte Carlo techniques to obtain numerical solutions, identifies the observables of interest, and contrasts the strengths and limitations of each algorithm.
+
+\section{Objectives}
+The main objective is a comprehensive comparison of three widely used Monte Carlo algorithms applied to the two-dimensional square-lattice Ising model without external field, for lattice sizes $L\in\{16,32,64,128\}$. We implemented three Fortran programs that realise the Metropolis \citep{Metropolis1953}, Glauber \citep{Glauber1963} and Wolff \citep{Wolff1989} dynamics. To validate and compare the algorithms we measure the key thermodynamic quantities: the mean magnetisation $\langle|m|\rangle$, the heat capacity per spin $c$, the magnetic susceptibility $\chi$, the Binder cumulant $U_4$, and the second-moment correlation length $\xi_L$, scanning both temperature and system size.
+
+The temperature sweep resolves the behaviour around the critical region near $T_c$ (eq.~\ref{eq:Tc_onsager}), while the size sweep enables finite-size scaling analysis to estimate critical exponents and extrapolate to the thermodynamic limit.
+
+We also measure the integrated autocorrelation time. Although not a thermodynamic observable, $\tau_{\mathrm{int}}$ quantifies dynamical efficiency and provides a useful comparison between algorithms, especially near criticality.
+
+\subsection*{Document structure}
+The thesis is organised as follows. Chapter~\ref{chap:teoria} presents the theoretical background required to understand the model, the phase transition and Monte Carlo methods, including the three update algorithms. Chapter~\ref{chap:metodos} describes the simulated model and the numerical parameters. Results and the FSS analysis are presented in Chapter~\ref{chap:resultados}, and conclusions appear in Chapter~\ref{chap:conclusiones}.

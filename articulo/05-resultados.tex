@@ -1,0 +1,151 @@
+\chapter{Resultados y discusión} \label{chap:resultados}
+En este capítulo, se recogen los resultados de las simulaciones descritas anteriormente, y se relacionan con las predicciones teóricas realizadas. Para cada observable, se presentan primero sus datos brutos para cada tamaño y algoritmo, y después se realiza el análisis que toque, ya sea cualitativo o FSS. El capítulo termina con la comparación dinámica entre algoritmos usando el tiempo de correlación integrado, que es donde aparecen las diferencias más significativas entre dinámicas locales y de cúmulo, y entre Metropolis y Glauber.
+
+\section{Capacidad calorífica y magnetización}
+
+Las figuras \ref{fig:c} y \ref{fig:m} muestran $c$ y $\langle |m| \rangle$ frente a $T$ para los tres algoritmos y los cuatro tamaños de red.
+
+\begin{figure}
+  \centering
+  \includesvg[width=\textwidth]{figs/c.svg}
+  \caption{Capacidad calorífica frente a temperatura para los distintos algoritmos y $L \in \{16, 32, 64, 128\}$. El máximo de $c$ se agudiza y desplaza hacia $T_c$ al aumentar $L$.}
+  \label{fig:c}
+\end{figure}
+\begin{figure}
+  \centering
+  \includesvg[width=\textwidth]{figs/m.svg}
+  \caption{Magnetización media frente a temperatura para los distintos algoritmos y $L \in \{16, 32, 64, 128\}$.}
+  \label{fig:m}
+\end{figure}
+
+Como esperábamos, la magnetización por espín cae de forma suave, no abrupta, desde valores próximos a la unidad hasta prácticamente cero en la fase paramagnética. Este salto, como también se dijo, es más pronunciado cuanto mayor es $L$, ya que en una red infinita debería ser un salto abrupto y se aproxima a eso al aumentar el tamaño. Los resultados de los tres algoritmos parecen prácticamente idénticos en estas dos magnitudes, por lo que se tiene la confianza de que se ha muestreado correctamente el ensamble para hacer los promedios. En la capacidad calorífica se puede apreciar para los tres algoritmos cómo el máximo se ensancha y se desplaza hacia la derecha de $T_c$ al disminuir $L$, lo cual es una tendencia coherente con lo predicho por la teoría.
+
+Se puede pensar que podría ser posible el obtener la temperatura crítica al tratar de seguir la divergencia de los máximos sucesivos de la capacidad calorífica hacia $T_c$. Sin embargo, el hecho de que se trate de una divergencia logarítmica implica que la altura del máximo crece lentamente como un logaritmo, lo que hace que la diferencia entre nuestros puntos más alejados sea ligera y de difícil ajuste. Esta dificultad es bien conocida, y es lo que motiva el uso del cumulante de Binder y de la susceptibilidad para el análisis FSS.
+
+En cuanto al promedio del valor absoluto de la magnetización media por espín, se acerca mucho a la predicción teórica lejos de la temperatura crítica. Cerca de esta, como ya se ha dicho antes el salto no sigue la forma esperada, sino que hace una transición continua a lo largo de una ventana de temperaturas. Sin embargo, sí que se puede observar de manera bastante clara que cuanto mayor es el tamaño del sistema, más abrupto se vuelve el cambio de fase.
+
+\section{Cumulante de Binder}
+
+El cumulante de Binder $U_4$ es el observable más directo para encontrar la temperatura crítica del sistema: las curvas para distintos $L$ deben cruzarse en $T_c$ para todos los tamaños con el resto de tamaños. En la práctica, por efectos de la escala finita esto no pasa, pero podemos usar el método descrito por ajuste lineal para tratar de extrapolar el resultado obtenido a un tamaño infinito. A continuación, se muestran los resultados obtenidos para el cálculo del cumulante en el entorno de $T_c$ en la figura \ref{fig:u4}, y las rectas de ajuste obtenidas junto con sus temperaturas extrapoladas usando el método descrito.
+
+\begin{figure}
+  \centering
+    \includesvg[width=\textwidth]{figs/fss_binder.svg}
+    \caption{Cumulante de Binder para todos los algoritmos y tamaños.}
+    \label{fig:u4}
+\end{figure}
+
+El valor universal del cumulante en el punto de cruce es, para el modelo de Ising 2D con condiciones de contorno periódicas, aproximadamente $U_4^* \approx 0{,}61$ \citep{Binder1981}. Este valor no depende de $L$ en el límite termodinámico y sirve como comprobación adicional: si los cruces de la simulación se producen a un valor similar a este, esto confirma que los datos son coherentes con la clase de universalidad en la que estamos. Si nos fijamos en las figuras, estos se producen precisamente a más o menos ese valor para todos los pares de tamaño y los tres algoritmos, lo que nos indica de nuevo que las simulaciones y las medidas están hechas de manera correcta. En la figura \ref{fig:extrp_u4}, se presentan las rectas de ajuste para cada algoritmo junto con su valor de $T_c$ extrapolado.
+
+\begin{figure}
+  \centering
+    \includesvg[width=\textwidth]{figs/extrp_lin.svg}
+    \caption{Extrapolación de los cruces de $U_4$ a infinito para cada algoritmo.}
+    \label{fig:extrp_u4}
+\end{figure}
+
+La corrección de escala finita a la posición del cruce decae como $L^{-1/\nu} = L^{-1}$ para el modelo de Ising bidimensional, de manera que al duplicar $L$ esa corrección sistemática se reduce a la mitad y las estimaciones $T_c(L,2L)$ deberían acercarse a $T_c$ de forma ordenada. Sin embargo, en las gráficas de Metropolis y Glauber no se aprecia este efecto. Esto se debe a que su tiempo de autocorrelación integrado $\tau_{\text{int}}$ se dispara mientras que en Wolff no, por lo que el ruido estadístico es mucho mayor en Metropolis y Glauber y apantalla el decaimiento. Así, solo se pueden observar esas mejoras sistemáticas al aumentar $L$ con una tendencia sistemática al usar Wolff, y en Metropolis y Glauber se dispersan sin mostrar esa mejora al aumentar $L$.
+
+\section{Susceptibilidad magnética}
+
+La figura \ref{fig:chi_bruta} recoge la susceptibilidad $\chi$ obtenida para los tres algoritmos a los cuatro tamaños estudiados. Se puede observar de manera muy clara cómo el máximo diverge con $L$, donde el valor máximo aumenta con $L$ como se esperaba por $\chi_{\max} \sim L^{\gamma/\nu}$ con $\gamma/\nu = 7/4$. También se puede ver que el máximo se estrecha y se desplaza hacia $T_c$ de manera ligera, conforme con lo que predice la teoría de FSS.
+
+\begin{figure}
+  \centering
+  \includesvg[width=\textwidth]{figs/suscept.svg}
+  \caption{Susceptibilidad magnética $\chi$ en función de $T$ para los tres algoritmos y $L \in \{16, 32, 64, 128\}$. La altura del máximo crece como $L^{\gamma/\nu}$.}
+  \label{fig:chi_bruta}
+\end{figure}
+
+Podemos cuantificar el crecimiento del máximo con $L$ para hacer una comprobación más de que se cumplen las predicciones teóricas. Buscando y extrayendo $\chi_{\max}(L)$ para cada tamaño, y representándolo en escala logarítmica frente a $\ln L$ lo que esperamos encontrar es que la pendiente de la recta sea $\gamma/\nu = 7/4 = 1{,}75$. A continuación se presentan los ajustes realizados con las pendientes obtenidas. Esta comprobación es independiente del colapso de datos y constituye una verificación directa de la ley de potencias $\chi_{\max} \sim L^{\gamma/\nu}$ sin necesidad de reescalar las variables.
+
+\begin{figure}
+  \centering
+  \includesvg[width=\textwidth]{figs/chi_scaling.svg}
+  \caption{Ajuste lineal para los algoritmos de $\ln{\chi_{\max}}$ frente a $\ln{L}$, y la pendiente obtenida para la recta.}
+  \label{fig:chi_scaling}
+\end{figure}
+
+\section{Escalado de tamaño finito de la susceptibilidad}
+
+La figura \ref{fig:fss_suscept} muestra el colapso de las funciones de la susceptibilidad magnética $\chi$ con los exponentes experimentales encontrados para cada algoritmo aplicando el colapso FSS.
+
+\begin{figure}
+  \centering
+  \includesvg[width=\textwidth]{figs/suscept_fss.svg}
+  \caption{Colapso FSS de $\chi$ con exponentes experimentales para cada algoritmo.}
+  \label{fig:fss_suscept}
+\end{figure}
+
+La calidad del colapso no alcanza la calidad deseada en ninguno de los casos. Para Metropolis y Glauber, donde el colapso puede parecer mejor aunque más ruidoso para $L$ mayores, ambos colapsos son considerablemente parecidos en tanto que el máximo de ambos algoritmos a los cuatro tamaños cae sobre $x\approx1$. Sin embargo, cuando observamos el máximo de Wolff, este está bastante desplazado con respecto a estos dos, más o menos sobre $x\approx 1,5$. Dado que Wolff no sufre ralentizamiento crítico cerca de $T_c$, esta diferencia en valores que deberían ser idénticos nos lleva a pensar que en el proceso de realización de la simulación de Metropolis y Glauber se infravaloró el número de pasos necesarios para realizar medidas no correlacionadas, de ahí la gran diferencia que se aprecia entre Metropolis y Glauber frente a Wolff.
+
+Este hecho refleja que los algoritmos locales fallan cerca de la temperatura crítica incluso cuando se les aplica lo que a priori parecía un número de pasos de termalización suficiente. En la sección \ref{sec:tint} se discutirá en más detalle los malos resultados obtenidos aquí. Con esta calidad, los exponentes que hemos extraído de los datos no son demasiado precisos para ninguno de los casos.
+
+\section{Longitud de correlación}
+
+La figura \ref{fig:xi} muestra $\xi_L$ frente a $T$ para cada algoritmo. Los valores son menores que $L/4$ en todas las gráficas para todos los tamaños. Eso es esperable con la definición de segundo momento usada en la fase ordenada, y no indica ningún problema en la simulación porque el ratio entre los máximos de las curvas se mantiene igual al ratio entre $L$.
+
+\begin{figure}
+  \centering
+  \includesvg[width=\textwidth]{figs/xi_vs_T.svg}
+  \caption{Longitud de correlación $\xi_L$ frente a $T$ para cada algoritmo y $L \in \{16, 32, 64, 128\}$. Los máximos crecen con $L$ y se desplazan hacia $T_c$.}
+  \label{fig:xi}
+\end{figure}
+
+Lo importante es el comportamiento del cociente $\xi_L / L$, que se muestra en la figura \ref{fig:xi_ratio}. Las curvas se cruzan alrededor de $T_c$, de la misma manera que ocurre con el cumulante de Binder pero ahora con otro observable, y lo que coincide son los máximos de estas y no un punto cualquiera. El hecho de que coincidan en valor para la misma $T_c$ para cada algoritmo, nos indica que efectivamente la longitud de correlación escala de manera lineal con el tamaño de la red.
+
+\begin{figure}
+  \centering
+  \includesvg[width=\textwidth]{figs/xi_ratio.svg}
+  \caption{Longitud de correlación escalada $\xi_L/L$ frente a $T$ para cada algoritmo y $L \in \{16, 32, 64, 128\}$.}
+  \label{fig:xi_ratio}
+\end{figure}
+
+El hecho de que tanto $U_4$ como $\xi_L/L$ se crucen aproximadamente en el mismo punto es una comprobación no trivial de la coherencia interna de los datos: son dos observables construidos de forma completamente distinta, uno a partir de momentos de la magnetización y otro a partir del factor de estructura en el espacio de momentos, y sin embargo ambos señalan la misma temperatura como crítica. Que los tres algoritmos den el mismo cruce en las dos magnitudes refuerza la conclusión de que el equilibrio se está muestreando correctamente en todos los casos. Además, podemos hacer un ajuste lineal para encontrar el exponente crítico $1/\nu$, el cual se muestra en la figura \ref{fig:xi_scaling}.
+
+\begin{figure}
+  \centering
+  \includesvg[width=\textwidth]{figs/xi_scaling.svg}
+  \caption{Ajuste lineal de los puntos de correlación máxima para cada tamaño $L$ frente a $L$, en escala logarítmica.}
+  \label{fig:xi_scaling}
+\end{figure}
+
+Como era esperable, la pendiente obtenida es en todos los casos muy próxima a uno, lo que nos indica que se obtienen valores aproximados $\nu\approx1$.
+
+\subsection{Colapso de datos de la longitud de correlación}
+
+La figura \ref{fig:xi_fss} muestra el colapso FSS de $\xi_L/L$ con los valores de $\nu$ encontrados buscando el colapso, para cada algoritmo.
+
+\begin{figure}
+  \centering
+  \includesvg[width=\textwidth]{figs/xi_fss.svg}
+  \caption{Colapso FSS de $\xi_L/L$ con exponente experimental para cada algoritmo.}
+  \label{fig:xi_fss}
+\end{figure}
+
+El cruce de las curvas ya visible en la figura \ref{fig:xi_ratio} se convierte aquí en el colapso sobre una función común cuando se usa $(T-T_c)L^{1/\nu}$ como variable de escala, confirmando $\nu = 1$ sin necesidad de ajustar ningún parámetro adicional. Aún así, el colapso de $\xi_L/L$ sufre de los mismos problemas que el colapso de la susceptibilidad. Para el colapso, los datos son más ruidosos en Metropolis y Glauber cuanto mayor es $L$, pero el reescalado se puede hacer de manera más o menos satisfactoria. Sin embargo, para Wolff aunque las curvas son mucho más limpias, se hace imposible el conseguir un colapso satisfactorio para ningún valor del exponente $\nu$. 
+
+\newpage
+\section{Tiempo de autocorrelación} \label{sec:tint}
+
+Las gráficas de la figura \ref{fig:tint} son quizás las más informativas del trabajo desde el punto de vista de la comparación algorítmica.
+
+\begin{figure}
+  \centering
+  \includesvg[width=\textwidth]{figs/tau_vs_T.svg}
+  \caption{Tiempo de autocorrelación integrado $\tau_{\text{int}}$ frente a $T$ para cada algoritmo y $L \in \{16, 32, 64, 128\}$.}
+  \label{fig:tint}
+\end{figure}
+
+Aquí existe una distinción inicial muy relevante. Para Metropolis y Glauber, se observa claramente el ralentizamiento crítico: el máximo en torno a $T_c$ crece con $L$, y para $L=128$ son ya muchísimo mayores que para $L=16$. Es importante distinguir la gran diferencia de tiempo de autocorrelación entre Metropolis y Glauber, donde en Glauber los máximos son consistentemente unas $3/2$ veces mayor que en Metropolis. Esto refleja el hecho de que la probabilidad de aceptación de un movimiento en Metropolis es consistentemente mayor que en Glauber, lo que se refleja en un tiempo de autocorrelación significativamente menor. Para Wolff, en cambio, $\tau_{\text{int}}$ es muy bajo y muy ruidoso en todo el rango con una pequeñísima estructura de máximo en $T_c$, lo cual es la manifestación directa de que los algoritmos de cúmulo eliminan prácticamente la ralentización crítica.
+
+Este fenómeno es el que se estima responsable de las diferencias entre Wolff y los otros dos al hacer los colapsos. A la hora de hacer una simulación realmente descorrelacionada, este dato implica que para Glauber al simular en $T_c$ debería hacerse tomando una medida cada $9000$ pasos, muy por encima de los 50 que se tomaron constantes para todas las temperaturas en Glauber y Metropolis. Eso significa que en el rango más relevante, se tomaron medidas muy correlacionadas entre sí para los tamaños más grandes, por lo que el error estadístico en estas es muy relevante.
+
+Además, usando el tiempo de autocorrelación integrado podemos estimar el exponente dinámico $z$ de cada algoritmo ajustando a una ley de potencias $\tau_{\max}(L) \sim L^z$ con barras de error suficientemente pequeñas para distinguir $z \approx 2$ de valores cercanos. Con los cuatro tamaños disponibles, la tendencia es claramente creciente para Metropolis y Glauber y consistente con $z \approx 2$, pero un ajuste cuantitativo preciso requeriría tamaños mayores y un número de muestras mayor para reducir las fluctuaciones en la estimación de $\tau_{\text{int}}$. Para Wolff, la estimación de $z$ es aún más difícil porque los valores de $\tau_{\text{int}}$ son del orden de la unidad y el ruido estadístico domina sobre la señal: el valor $z \approx 0{,}25$ reportado en la literatura \citep{Wolff1989} es difícilmente distinguible de $z = 0$ con los datos disponibles, aunque la práctica ausencia de máximo ya es en sí misma una evidencia cualitativa muy clara de la reducción del \textit{critical slowing down}. Desde el punto de vista práctico, la consecuencia más directa de todo esto es que, para los tamaños estudiados en este trabajo, el coste efectivo de obtener una muestra estadísticamente independiente cerca de $T_c$ es varios órdenes de magnitud menor con Wolff que con los otros dos algoritmos. Aún así, la figura \ref{fig:tint-scaling} presenta los resultados obtenidos de realizar estos ajustes, donde se ve que se aproximan bastante bien al valor teórico.
+
+\begin{figure}
+  \centering
+  \includesvg[width=\textwidth]{figs/tau_scaling.svg}
+  \caption{Ajuste logarítmico para hallar el exponente dinámico del sistema en cada algoritmo.}
+  \label{fig:tint-scaling}
+\end{figure}

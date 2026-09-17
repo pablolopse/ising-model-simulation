@@ -1,0 +1,132 @@
+\chapter{Model and methods} \label{chap:metodos}
+
+\section{Simulated model}
+
+We simulate the two-dimensional Ising model on a square lattice of $N=L\times L$ spins with periodic boundary conditions in both directions. Spins take values $\sigma_i=\pm1$ and the Hamiltonian is given by eq.~\eqref{eq:hamiltonian} with nearest-neighbour coupling $J=1$ and no external field ($H=0$). We set Boltzmann's constant $k_B=1$, so it is convenient to work in reduced units
+\[ T^*=\frac{k_B T}{J}, \]
+which with our choice $J=k_B=1$ equals $T$ numerically; we drop the asterisk and denote the temperature simply by $T$. With this convention Onsager's exact critical temperature is $T_c\approx2.2692$ \cite{Onsager1944}.
+
+We study lattice sizes $L\in\{16,32,64,128\}$ (i.e. $N=256,1024,4096,16384$ spins). This choice balances the need for a sufficiently wide size range (a factor of 8 between smallest and largest) for reliable finite-size scaling analysis with the computational cost, which scales as $L^2$ per Monte Carlo step; near $T_c$ the number of steps required for independent samples also grows like $L^z$, making very large lattices impractical for local update algorithms.
+
+\section{Definition of a Monte Carlo step} \label{sec:pasomc}
+
+For Metropolis and Glauber dynamics we define one Monte Carlo step (MCS) as $N=L^2$ single-spin flip attempts, i.e. on average one attempt per spin. Each attempted spin is chosen at random with replacement, so some spins may be proposed more than once and others not at all within the same MCS. This convention yields a time unit that is comparable across different system sizes.
+
+For the Wolff cluster algorithm the cluster size varies between updates. We adopt the standard convention that one Wolff MCS consists of building as many clusters as needed until the total number of flipped spins in that MCS sums to $N$. On average this flips the same number of spins per MCS as the local-update algorithms, making time units comparable between all three methods. The number of clusters per MCS is inversely proportional to the mean cluster size: few clusters near $T_c$ (large clusters) and many clusters far from $T_c$ (small clusters).
+
+\subsection{Boundary conditions}
+
+Finite lattices have a boundary fraction of order $1/L$, which can distort results if spins at the edges have fewer neighbours than interior spins. To eliminate boundary effects we use periodic boundary conditions: right-edge spins are neighbours of left-edge spins and top-edge neighbours of bottom-edge spins, so the lattice is topologically a torus and every spin has the same number of neighbours. This restores translational homogeneity; the remaining deviations from the thermodynamic limit are the finite-size effects analysed with FSS (Sec.~\ref{sec:fss}).
+
+\section{Initial configuration and thermalisation}
+
+For each combination of $L$, $T$ and algorithm simulations start from the fully ordered configuration with all spins $+1$ (cold start). This choice avoids trapping in metastable regions when sweeping a wide temperature range. A hot start (random spins) converges faster in the paramagnetic phase but may be more prone to metastability; we use cold starts throughout to be conservative.
+
+After the initial configuration we perform a number of thermalisation MCS without measurements so the system forgets the initial condition and reaches equilibrium at temperature $T$. The thermalisation length depends on temperature: in the coarse grid away from the critical region Metropolis and Glauber autocorrelation times are small and $6000$ MCS suffice; within the fine window around $T_c$ critical slowing down ($\tau\sim L^z$) requires longer thermalisation, so we use $10000$ MCS there. Wolff's autocorrelation times are of order unity across the range, so $6000$ MCS are more than enough for cluster updates.
+
+\section{Temperature grid}
+
+The temperature sweep is the same for all algorithms and sizes and spans $T=0.15$ to $T=5.0$. We use an adaptive resolution with a fine grid in a critical window and a coarser grid elsewhere.
+
+The central critical window is $[T_{\text{lo}},T_{\text{hi}}]$, asymmetric around $T_c$, with
+\[ T_{\text{lo}} = T_c - 1.0\,\frac{T_c}{L}, \qquad T_{\text{hi}} = T_c + 3.0\,\frac{T_c}{L}. \]
+The width scales as $T_c/L$ because FSS predicts that finite-size structure (peak of $\chi$, Binder crossing, inflection of $\xi_L/L$) concentrates in a region of relative width $\sim L^{-1/\nu}=L^{-1}$ around $T_c$ \citep{Newman1999}. The asymmetry (factor 1 below and 3 above $T_c$) reflects that in finite systems the susceptibility peak typically occurs slightly above $T_c$, so we allow extra margin on the high-temperature side.
+
+Inside the fine window we sample with step $\Delta T=0.1\,T_c/L$. Since the width is $T_{\text{hi}}-T_{\text{lo}}=4T_c/L$, the fine window is divided into $40$ subintervals (41 points), independent of $L$. Outside the window we use a coarse uniform step $\Delta T=0.1$ on $[0.15,T_{\text{lo}})$ and $(T_{\text{hi}},5.0]$.
+
+\begin{table}
+\centering
+\begin{tabular}{ccccc}
+\toprule
+$L$ & Fine window $[T_{\mathrm{lo}}, T_{\mathrm{hi}}]$ & $\Delta T_{\mathrm{fine}}$ & Coarse range & $\Delta T_{\mathrm{coarse}}$ \\
+\midrule
+$16$  & $[2{,}127,\ 2{,}695]$ & $1{,}418\times10^{-2}$ & $[0{,}150,\ 2{,}127)\cup(2{,}695,\ 5{,}000]$ & $0{,}1$ \\
+$32$  & $[2{,}198,\ 2{,}482]$ & $7{,}091\times10^{-3}$ & $[0{,}150,\ 2{,}198)\cup(2{,}482,\ 5{,}000]$ & $0{,}1$ \\
+$64$  & $[2{,}234,\ 2{,}376]$ & $3{,}546\times10^{-3}$ & $[0{,}150,\ 2{,}234)\cup(2{,}376,\ 5{,}000]$ & $0{,}1$ \\
+$128$ & $[2{,}251,\ 2{,}322]$ & $1{,}773\times10^{-3}$ & $[0{,}150,\ 2{,}251)\cup(2{,}322,\ 5{,}000]$ & $0{,}1$ \\
+\bottomrule
+\end{tabular}
+\caption{Temperature windows for each lattice size $L$, using $T_c=2{,}2692$, $T_{\mathrm{lo}}=T_c-T_c/L$ and $T_{\mathrm{hi}}=T_c+3\,T_c/L$. The fine window always contains $40$ subintervals ($41$ points), independently of $L$.}
+\label{tab:malla_T}
+\end{table}
+
+\section{Simulation parameters}
+
+After thermalisation we perform $N_{\text{steps}}=1.99\times10^6$ measurement MCS per temperature and size, which provides statistically significant samples for our analysis. We do not record a measurement every MCS to reduce storage and correlation: for Metropolis and Glauber we sample every $50$ MCS, yielding $3.98\times10^4$ measurements per temperature and size, while for Wolff we sample every $5$ MCS, yielding $3.98\times10^5$ measurements per temperature and size.
+
+The sampling intervals were chosen based on typical autocorrelation times outside the critical region, where $\tau_{\mathrm{int}}$ is a few MCS for Metropolis and Glauber. Sampling every 50 MCS usually ensures effectively independent measurements away from criticality, but near $T_c$ autocorrelation times for the largest sizes exceed 50 MCS, so measurements remain correlated; this increases statistical errors but exploring extremely long runs is beyond the present work.
+
+For Wolff a 5-MCS sampling interval suffices across the whole temperature range because $\tau_{\mathrm{int}}$ is of order unity even near $T_c$.
+
+\section{Monte Carlo methods} \label{sec:montecarlo}
+
+Computing the partition function $Z$ exactly requires summing over $2^N$ microstates, which is infeasible except for tiny lattices. Monte Carlo methods avoid this by generating a Markov chain of configurations whose stationary distribution is the Boltzmann weight $P(\sigma)=e^{-\beta\mathcal{H}(\sigma)}/Z$, so that typical configurations contributing most to thermal averages are sampled more often (importance sampling) \citep{Metropolis1953,Sokal1997}.
+
+Convergence to the correct distribution is ensured if transition probabilities $W(\sigma\to\sigma')$ satisfy detailed balance
+\[ P(\sigma)\,W(\sigma\to\sigma') = P(\sigma')\,W(\sigma'\to\sigma), \]
+and the chain is ergodic (any configuration reachable from any other in a finite number of steps). The three algorithms described below differ in how they propose candidate configurations $\sigma'$ and in the transition probabilities, but all satisfy these requirements.
+
+\subsection{Metropolis algorithm}
+
+The Metropolis algorithm \citep{Metropolis1953} proposes local single-spin flips. From a configuration $\sigma$ choose a site $i$ uniformly at random and compute the energy change $\Delta E$ that would result from flipping $s_i\to- s_i$. Accept the new configuration with probability
+\[ W(\sigma\to\sigma')=\min\left(1,e^{-\beta\Delta E}\right). \]
+If $\Delta E\le0$ the flip is always accepted; if $\Delta E>0$ it is accepted with probability $e^{-\beta\Delta E}$, implemented by comparing a uniform random number in $[0,1]$ to $e^{-\beta\Delta E}$. Rejected proposals leave the configuration unchanged but still count as an attempt. Detailed balance follows because $W(\sigma\to\sigma')/W(\sigma'\to\sigma)=e^{-\beta\Delta E}=P(\sigma')/P(\sigma)$.
+
+On the square lattice $\Delta E$ can take only five values (depending on the number of aligned neighbours), so acceptance probabilities can be precomputed to reduce floating-point operations.
+
+\subsection{Glauber dynamics}
+
+Glauber dynamics \citep{Glauber1963} is another single-spin update scheme with a different transition rule. Instead of proposing a flip and accepting or rejecting it, Glauber updates the spin $i$ by sampling its new value directly from the conditional probabilities given neighbour orientations. If $E_i^+$ and $E_i^-$ are the energies with $s_i=+1$ and $s_i=-1$, the probability to set $s_i=+1$ is
+\[ p_i^+ = \frac{e^{-\beta E_i^+}}{e^{-\beta E_i^+}+e^{-\beta E_i^-}}, \]
+and $1-p_i^+$ for $s_i=-1$. This rule also satisfies detailed balance and yields the same equilibrium distribution as Metropolis, but the dynamics differ: in Glauber the new state is chosen independently of the previous one, while Metropolis depends on the acceptance criterion. Both are local-update algorithms and share similar qualitative critical dynamics.
+
+\subsection{Wolff cluster algorithm}
+
+The Wolff algorithm \citep{Wolff1989} belongs to the family of cluster algorithms designed to reduce autocorrelation times near $T_c$. Instead of updating single spins, a connected cluster of like-oriented spins is built and flipped as a whole.
+
+The procedure is: pick a random seed spin and examine its neighbours; add each neighbour with the same orientation to the cluster with probability
+\[ p_{\mathrm{add}}=1-e^{-2\beta J}. \]
+Newly added spins are examined recursively until no further neighbours are added. The entire cluster is then flipped. This cluster acceptance probability preserves detailed balance for the global cluster flip, and the equilibrium distribution matches that of the local algorithms.
+
+The advantage of Wolff is that near $T_c$ clusters grow large and each update flips a macroscopic fraction of the lattice, dramatically reducing autocorrelation times. The dynamic exponent $z$ is therefore much smaller than for Metropolis or Glauber, which is why we include Wolff in the comparison: it enables efficient sampling close to criticality for the lattice sizes used here.
+
+\section{Measured observables}
+
+At every measurement step we record the following quantities from the instantaneous configuration:
+
+\begin{itemize}
+  \item Total energy of the system, $E=\mathcal{H}$.
+  \item Signed magnetisation per spin, $m=\frac{1}{N}\sum_i\sigma_i$.
+  \item Powers $m^2$ and $m^4$, used to compute $\chi$ and $U_4$.
+  \item Structure factor at the smallest wavevector, $\chi(k_{\min})$, needed for $\xi_L$.
+\end{itemize}
+
+After completing the measurements at a given temperature we compute averages of these quantities and store them. Post-processing generates the final observables and plots. The measured quantities are as follows.
+
+The mean absolute magnetisation per spin is defined as $\langle|m|\rangle$, i.e. the average of the absolute value of the magnetisation per spin. In a finite system global spin-inversion symmetry implies $\langle m\rangle\approx0$, so using $\langle|m|\rangle$ provides a non-zero estimator of the order parameter.
+
+The heat capacity per spin is computed from energy fluctuations:
+\[ C=\frac{\beta^2}{N}\left(\langle E^2\rangle-\langle E\rangle^2\right), \]
+which is eq.~\eqref{eq:Cv}. This estimator is efficient because $\langle E^2\rangle$ and $\langle E\rangle$ are accumulated during the same measurement pass.
+
+The magnetic susceptibility per spin follows from magnetisation fluctuations:
+\[ \chi=\frac{L^2}{T}\left(\langle m^2\rangle-\langle|m|\rangle^2\right), \]
+using $\beta=1/T$ and $M=Nm$, so $\chi=\beta(\langle M^2\rangle-\langle|M|\rangle^2)/N=L^2(\langle m^2\rangle-\langle|m|\rangle^2)/T$. In the disordered phase $\langle|m|\rangle\approx0$ and $\chi\approx L^2\langle m^2\rangle/T$.
+
+The Binder cumulant is computed as
+\[ U_4=1-\frac{\langle m^4\rangle}{3\langle m^2\rangle^2}. \]
+In the ordered phase ($T\to0$) $|m|\to1$ and $U_4\to2/3$, while in the disordered phase ($T\to\infty$) $m$ is approximately Gaussian with $U_4\to0$. Intersections of $U_4(T)$ curves for different $L$ (interpolated using splines) are used to estimate $T_c$.
+
+The second-moment correlation length $\xi_L$ is computed from eq.~\eqref{eq:xi_def}, requiring the structure factor at $\mathbf{k}_1=(2\pi/L,0)$. In the Fortran simulations we accumulated real and imaginary parts of
+\[ \sum_j\sigma_j e^{i\mathbf{k}_1\cdot\mathbf{r}_j} \]
+separately and stored the averaged squared modulus per spin to obtain $\chi(k_{\min})$.
+
+The integrated autocorrelation time $\tau_{\mathrm{int}}$ is estimated for the time series of $|m(t)|$, the observable most sensitive to correlations near $T_c$. We use the Madras–Sokal windowing estimator described in Sec.~\ref{sec:csd} (eq.~\eqref{eq:tau_int}), with the window $W$ chosen automatically as the first time where $\rho(t)<e^{-t/\tau_{\mathrm{int}}}$ and $\tau_{\mathrm{int}}$ computed iteratively. Note that $\tau_{\mathrm{int}}$ is a dynamical quantity, not an equilibrium observable, which is why its analysis is presented separately in Chapter~\ref{chap:resultados}.
+
+\section{Finite-size scaling analysis}
+
+To estimate $T_c$ we first use Binder cumulant crossings. Data for each $L$ are interpolated with splines, pairwise crossings between consecutive sizes are located, and the crossing temperatures are plotted against $1/L^2$. A linear extrapolation in $1/L^2$ should intersect the vertical axis at $T_c$, yielding the estimate reported below while attempting to reduce finite-size corrections.
+
+For the data-collapse analysis we use Onsager's exact value $T_c=2.2692$ as a reference and the exact static exponents for the 2D Ising universality class: $\nu=1$, $\gamma/\nu=7/4$ and $\beta/\nu=1/8$. We then rescale susceptibility and correlation-length data for all sizes and adjust exponents visually until an approximate collapse onto a single universal curve is observed.
+
+We work with the reduced temperature $t=(T-T_c)/T_c$ and with the scaling variable $x=t\,L^{1/\nu}=(T-T_c)L/T_c$ (with $\nu=1$). We obtain the susceptibility collapse by plotting $\chi L^{-\gamma/\nu}=\chi L^{-7/4}$ versus $x$: according to eq.~\eqref{eq:fss_chi2} curves for different $L$ should collapse. The same procedure applies to $\xi_L/L$ versus $x$, which by eq.~\eqref{eq:fss_xi2} should also collapse onto a universal function. We inspect collapses visually because a quantitative assessment would require an explicit model for the scaling function $\tilde{\chi}(x)$, beyond the scope of this work. With this choice the fine temperature window $[T_c-T_c/L,\,T_c+3T_c/L]$ maps to a fixed interval $x\in[-1,3]$, providing the same range and point density for all sizes.

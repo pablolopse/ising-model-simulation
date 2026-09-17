@@ -1,0 +1,157 @@
+\chapter{Modelo y métodos} \label{chap:metodos}
+
+\section{El modelo simulado}
+
+El modelo con el que trabajamos es el de Ising bidimensional sobre una red cuadrada de $N = L \times L$ espines, con condiciones de contorno periódicas en las dos direcciones. Los espines toman valores $\sigma_i = \pm 1$ y el hamiltoniano es el de la ecuación~\eqref{eq:hamiltonian}, con un acoplamiento $J = 1$ entre primeros vecinos y sin campo magnético externo ($H = 0$). Fijamos también la constante de Boltzmann a $k_B = 1$. Resulta entonces natural trabajar con la temperatura reducida, adimensional,
+\[
+T^* = \frac{k_B T}{J},
+\]
+que con nuestra elección $J = k_B = 1$ coincide numéricamente con $T$. Para aligerar la
+notación omitiremos el asterisco a partir de aquí y escribiremos simplemente $T$ para
+referirnos a esta temperatura reducida. Con esta convención, la temperatura crítica exacta
+de Onsager \cite{Onsager1944} es $T_c \approx 2{,}2692$.
+
+Los tamaños de red que estudiamos son $L \in \{16, 32, 64, 128\}$, que corresponden a sistemas de $256$, $1024$, $4096$ y $16384$ espines. La elección de estos tamaños no es casual. Por una parte, se consigue cubrir un rango de $L$ suficientemente amplio como para poder llevar a cabo un análisis por escalado finito satisfactorio, ya que hay un factor de 8 entre el mayor y menor tamaño; por otra parte, tampoco podemos tomar redes demasiado grandes ya que el coste computacional por paso Montecarlo crece como $L^2$, y cerca de $T_c$ el número de pasos Montecarlo necesarios para obtener medidas independientes crece también como $L^z$, por lo que para los algoritmos de Metropolis y Glauber sería irrealizable.
+
+\section{Definición del paso Montecarlo} \label{sec:pasomc}
+
+Un paso Montecarlo de Metropolis o Glauber consiste en $N = L^2$ intentos de voltear un espín, es decir, uno por cada espín de la red en promedio (el espín que se intenta voltear en cada paso se elige al azar con reemplazamiento, por lo que algunos pueden salir seleccionados más de una vez dentro del mismo paso y otros ninguna). Esta es la definición habitual en la literatura, y tiene la ventaja de que el tiempo queda medido en unidades comparables entre tamaños distintos: un paso Montecarlo son $N$ intentos, o lo que es lo mismo, un intento por espín de media, con lo que la escala temporal es intrínseca al sistema y no crece de forma artificial con $L$.
+
+En Wolff la definición es más delicada, ya que el tamaño del cúmulo cambia de una construcción a otra. Seguimos la convención habitual: un paso de Wolff es la construcción de los cúmulos que hacen falta para que la suma acumulada de sus tamaños llegue a $N$. Así, en promedio, un paso Montecarlo de Wolff gira el mismo número total de espines que uno de Metropolis o Glauber, por lo que las unidades de tiempo son comparables entre los tres algoritmos. En la práctica, el número de cúmulos construidos por paso Montecarlo es inversamente proporcional al tamaño medio del cúmulo: cerca de $T_c$, donde los cúmulos son grandes, hacen falta pocas; lejos de $T_c$, donde son pequeños, hacen falta muchas.
+
+\subsection{Condiciones de contorno}
+
+En una simulación numérica, la red tiene un tamaño finito, lo que hace que los espines de los extremos tengan menos vecinos que los de dentro. Para un sistema de $L\times L$ espines, la fracción de espines en el borde es del orden de $1/L$, lo que para redes pequeñas es una fracción no despreciable que puede distorsionar los resultados al romper la homogeneidad del sistema. Para evitar esto se utilizan condiciones de contorno periódicas: los espines del borde derecho de la red se toman como vecinos de los del borde izquierdo, y los del borde superior como vecinos de los del borde inferior, de modo que la red es efectivamente equivalente a un toroide y todos los espines tienen exactamente el mismo número de vecinos. Con esto se elimina el efecto de borde y se recupera la homogeneidad traslacional del sistema, de forma que las únicas desviaciones respecto al límite termodinámico que quedan son las debidas al tamaño finito de la red, que son precisamente las que se estudian mediante el escalado de tamaño finito descrito en la sección~\ref{sec:fss}.
+
+\section{Configuración inicial y termalización}
+
+Para cada combinación de tamaño $L$, temperatura $T$ y algoritmo, la simulación arranca desde una configuración inicial donde todos los espines toman valor $+1$. Esta forma de empezar, conocida como \textit{arranque frío}, es la más natural cuando se barre un rango amplio de temperaturas, ya que así el sistema no corre el riesgo de atascarse en zonas metaestables. Existe también el \textit{arranque caliente} (todos los espines aleatorios, o asignados con probabilidad $1/2$), que converge más rápido en la fase paramagnética pero corre el riesgo de converger en zonas metaestables. En este estudio usamos siempre el arranque frío para prevenir ese tipo de atascos.
+
+Una vez fijada la configuración inicial, hacemos una tanda de pasos de termalización sin tomar ninguna medida, para que el sistema olvide la condición de partida y llegue al equilibrio a la temperatura $T$ correspondiente. El número de pasos Montecarlo de termalización no es el mismo en todo el barrido, sino que sigue la misma división que el vector de temperaturas. En el rango grueso, lejos de la región crítica, los tiempos de autocorrelación de Metropolis y Glauber son pequeños y nos basta con $6000$ pasos. En la ventana fina alrededor de $T_c$ aparece el \textit{critical slowing down}: los tiempos crecen como $\sim L^z$, por lo que ahí subimos la termalización hasta $10000$ pasos para asegurarnos de que el sistema también llega al equilibrio. Para Wolff no hace falta esta precaución, ya que sus tiempos de correlación son del orden de la unidad en todo el rango, y $6000$ pasos Montecarlo son mucho más de los que se necesitan para algoritmos de cúmulo a cualquier temperatura.
+
+\section{Vector de temperaturas}
+
+Este recorrido en temperaturas es idéntico para los tres algoritmos y todos los tamaños $L$, y va de $T = 0{,}15$ a $T = 5{,}0$. Lo que cambia dentro de ese intervalo es la resolución: usamos un recorrido adaptativo con dos pasos distintos según lo cerca que estemos del punto crítico.
+
+La pieza central es la ventana crítica $[T_{\text{lo}}, T_{\text{hi}}]$, asimétrica alrededor de $T_c$, con extremos
+\[
+T_{\text{lo}} = T_c - 1{,}0\,\frac{T_c}{L}, \qquad T_{\text{hi}} = T_c + 3{,}0\,\frac{T_c}{L}.
+\]
+Que la anchura escale como $T_c/L$ viene de que la teoría FSS dice que toda la estructura de escala finita (el máximo de $\chi$, el cruce del cumulante de Binder, la inflexión de $\xi_L/L$) se concentra en una región de anchura relativa $\sim L^{-1/\nu} = L^{-1}$ alrededor de $T_c$ \citep{Newman1999}, es decir, de anchura $\sim T_c/L$ en unidades absolutas; si queremos resolver bien esas estructuras, la ventana fina tiene que escalar igual. La asimetría (un factor $1$ por debajo de $T_c$ y un factor $3$ por encima) es porque en sistemas finitos el máximo de la susceptibilidad surge en un punto algo mayor que $T_c$, por lo que conviene dejar más margen por el lado de las temperaturas altas para no perderlo.
+
+Dentro de esa ventana muestreamos con paso fino $\Delta T = 0{,}1\,T_c/L$. Como la anchura es $T_{\text{hi}} - T_{\text{lo}} = 4\,T_c/L$ y el paso es $0{,}1\,T_c/L$, la zona fina se divide siempre en $40$ subintervalos, independientes de $L$: tanto la anchura como el paso escalan con $T_c/L$, así que el número de puntos no cambia con el tamaño. Fuera de la ventana, en $[0{,}15,\, T_{\text{lo}})$ y en $(T_{\text{hi}},\, 5{,}0]$, usamos un paso grueso uniforme $\Delta T = 0{,}1$, que es más que suficiente para describir el comportamiento general de las magnitudes lejos de la región crítica.
+
+\begin{table}
+\centering
+\begin{tabular}{ccccc}
+\toprule
+$L$ & Ventana fina $[T_{\text{lo}}, T_{\text{hi}}]$ & $\Delta T_{\text{fino}}$ & Rango grueso & $\Delta T_{\text{grueso}}$ \\
+\midrule
+$16$  & $[2{,}127,\ 2{,}695]$ & $1{,}418\times10^{-2}$ & $[0{,}150,\ 2{,}127)\cup(2{,}695,\ 5{,}000]$ & $0{,}1$ \\
+$32$  & $[2{,}198,\ 2{,}482]$ & $7{,}091\times10^{-3}$ & $[0{,}150,\ 2{,}198)\cup(2{,}482,\ 5{,}000]$ & $0{,}1$ \\
+$64$  & $[2{,}234,\ 2{,}376]$ & $3{,}546\times10^{-3}$ & $[0{,}150,\ 2{,}234)\cup(2{,}376,\ 5{,}000]$ & $0{,}1$ \\
+$128$ & $[2{,}251,\ 2{,}322]$ & $1{,}773\times10^{-3}$ & $[0{,}150,\ 2{,}251)\cup(2{,}322,\ 5{,}000]$ & $0{,}1$ \\
+\bottomrule
+\end{tabular}
+\caption{Ventanas de temperaturas para cada tamaño $L$, con $T_c = 2{,}2692$, $T_{\text{lo}} = T_c - T_c/L$ y $T_{\text{hi}} = T_c + 3\,T_c/L$. La ventana fina contiene siempre $40$ subintervalos ($41$ puntos), independientemente de $L$.}
+\label{tab:malla_T}
+\end{table}
+
+\section{Parámetros de la simulación}
+
+Una vez terminada la termalización, hacemos $N_{\text{steps}} = 1{,}99\cdot10^6$ pasos Montecarlo de medida para cada temperatura y tamaño, cantidad que veremos debería ser suficiente para obtener una muestra estadísticamente significativa. No tomamos una muestra en cada paso Montecarlo, sino cada cierto número de ellos, para reducir la correlación entre medidas consecutivas sin tener que almacenar una gran cantidad de datos en memoria. En Metropolis y Glauber muestreamos cada $50$ pasos Montecarlo, lo que nos deja $3,98\cdot10^4$ medidas por temperatura y tamaño, y en Wolff cada $5$ pasos Montecarlo, con lo que obtenemos $3,98\cdot10^5$ medidas por temperatura y tamaño.
+
+Elegimos esta frecuencia de muestreo a partir del tiempo de autocorrelación que se espera fuera de la región crítica, donde $\tau_{\text{int}}$ es del orden de unos pocos pasos Montecarlo para Metropolis y Glauber. Muestrear cada $50$ pasos Montecarlo asegura que las medidas están suficientemente descorrelacionadas en casi todo el rango de temperaturas. El problema aparece cerca de $T_c$: para los tamaños mayores los tiempos de correlación se van por encima de $50$ pasos Montecarlo, por lo que las medidas siguen estando correlacionadas entre sí. Esto no introduce ningún sesgo en los valores medios, pero sí hace que el error estadístico real sea mayor que el que saldría si tuviéramos muestras independientes, pero sale del alcance de este trabajo el realizar simulaciones con tantos pasos.
+
+En Wolff, el intervalo de $5$ pasos Montecarlo vale para todo el rango de temperaturas porque, como ya hemos visto, su $\tau_{\text{int}}$ es del orden de la unidad incluso cerca de $T_c$.
+
+\section{Métodos de Montecarlo} \label{sec:montecarlo}
+
+Calcular el valor exacto de $Z$ implica hacer un sumatorio sobre los $2^N$ microestados del sistema, un cálculo impracticable salvo para redes de dimensiones ridículamente pequeñas. Los métodos de Montecarlo evitan este problema generando, mediante una cadena de Markov, una sucesión de configuraciones cuya distribución de probabilidad converge a la distribución de Boltzmann $P(\sigma)=e^{-\beta\mathcal{H}(\sigma)}/Z$, de forma que se priorice la visita a los estados que más contribuyen a los promedios térmicos en lugar de realizar un recorrido exhaustivo por todos los microestados compatibles con el macroestado y luego pesarlos por su peso de Boltzmann. Esto es lo que se conoce como muestreo por importancia (\textit{importance sampling}) \citep{Metropolis1953,Sokal1997}.
+
+Para que el proceso de Markov converja a la distribución correcta, basta con imponer que las probabilidades de transición $W(\sigma\to\sigma')$ entre dos configuraciones satisfagan la condición de balance detallado,
+\[
+P(\sigma)\,W(\sigma\to\sigma') = P(\sigma')\,W(\sigma'\to\sigma),
+\]
+y la condición de ergodicidad, según la cual cualquier configuración es alcanzable desde cualquier otra en un número finito de pasos. Los tres algoritmos que se describen a continuación difieren en cómo eligen las configuraciones candidatas $\sigma'$ y en cómo definen $W(\sigma\to\sigma')$, pero los tres satisfacen ambas condiciones.
+
+\subsection{Algoritmo de Metropolis}
+
+El algoritmo de Metropolis \citep{Metropolis1953} propone cambios locales de un solo espín. Partiendo de una configuración $\sigma$, se elige un espín $i$ al azar y se calcula la variación de energía $\Delta E$ que resultaría de invertir su signo, $s_i \to -s_i$, manteniendo el resto de la red fija. La nueva configuración se acepta con probabilidad
+\[
+W(\sigma\to\sigma') = \min\left(1,\, e^{-\beta\Delta E}\right).
+\]
+Si $\Delta E \leq 0$ el cambio se acepta siempre; si $\Delta E > 0$ se acepta con probabilidad $e^{-\beta\Delta E}$, lo que en la práctica se implementa generando un número aleatorio uniforme en $[0,1]$ y comparando. Si la propuesta no se acepta, la configuración no cambia y de cualquier forma se contabiliza un paso de Montecarlo. Esta regla cumple la condición de balance detallado porque la razón $W(\sigma\to\sigma')/W(\sigma'\to\sigma)$ es siempre igual a $e^{-\beta\Delta E} = P(\sigma')/P(\sigma)$, independientemente de cuál de las dos probabilidades sea la que se trunca a $1$.
+
+Para la red cuadrada bidimensional, $\Delta E$ solo puede tomar cinco valores, según el número de vecinos alineados con el espín cuya inversión se propone, de modo que las probabilidades de aceptación $e^{-\beta\Delta E}$ pueden precalcularse antes del inicio de la simulación en lugar de hacerlo en cada paso, lo que representa una disminución apreciable del coste computacional ya que se hacen muchas menos operaciones de coma flotante.
+
+\subsection{Dinámica de Glauber}
+
+La dinámica de Glauber \citep{Glauber1963} es también un algoritmo de actualización de un solo espín, pero con una regla de transición distinta. En lugar de proponer una inversión y decidir si se acepta o no, en cada paso se calcula directamente la probabilidad de que el espín $i$ tome el valor $+1$ o el valor $-1$ dadas las orientaciones de sus vecinos, y se asigna uno de los dos valores de acuerdo con esas probabilidades, sin importar cuál fuera el valor anterior del espín. Si $E_i^{+}$ y $E_i^{-}$ son las energías del sistema con $s_i=+1$ y $s_i=-1$ respectivamente, la probabilidad de que el espín quede en el estado $+1$ es
+\[
+p_i^{+} = \frac{e^{-\beta E_i^{+}}}{e^{-\beta E_i^{+}} + e^{-\beta E_i^{-}}},
+\]
+y la de que quede en el estado $-1$ es $1-p_i^{+}$. Esta regla también satisface el balance detallado, y da lugar a la misma distribución de equilibrio que el algoritmo de Metropolis.
+
+La diferencia entre ambos radica en la dinámica: en Glauber el nuevo estado del espín se decide de forma independiente del estado anterior, mientras que en Metropolis depende de la anterior por el hecho de que el cambio sólo se acepta bajo una determinada condición. Sin embargo, ambos algoritmos pertenecen a la categoría general de algoritmos de actualización local y comparten el mismo exponente dinámico $z$, por lo que presentan comportamientos cerca de $T_c$ cualitativamente similares.
+
+\subsection{Algoritmo de Wolff}
+
+El algoritmo de Wolff \citep{Wolff1989} pertenece a una familia distinta, los algoritmos de \textit{cúmulo}, diseñados para reducir el tiempo de correlación cerca de $T_c$. En lugar de actualizar un espín a la vez, en cada paso se construye un agrupamiento de espines vecinos con la misma orientación y se invierte el agrupamiento completo de una sola vez.
+
+El procedimiento es el siguiente. Se elige un espín al azar, que forma la semilla del cúmulo, y se examinan sus vecinos: cada vecino que tenga la misma orientación que la semilla se añade al cúmulo con probabilidad
+\[
+p_{\text{add}} = 1 - e^{-2\beta J}.
+\]
+Cada espín que se incorpora al cúmulo se examina a su vez de la misma manera, de modo que el cúmulo va creciendo hasta que no quedan vecinos que añadir. Una vez completado, todos los espines del cúmulo se invierten simultáneamente. Puede demostrarse que esta probabilidad de aceptación garantiza el balance detallado para el movimiento global de inversión del cúmulo, y por tanto la distribución de equilibrio que se obtiene es la misma que con los otros dos algoritmos.
+
+La ventaja del algoritmo de Wolff es que cerca de $T_c$, donde los algoritmos locales se quedan atascados en regiones del espacio de configuraciones muy correlacionadas entre sí, el tamaño promedio de los cúmulos crece de modo que cada actualización afecta a una fracción significativa de la red, reduciendo considerablemente el tiempo de correlación. El exponente dinámico $z$ es por tanto mucho menor que el de Metropolis o Glauber, y esta es la razón principal por la que se incluye este algoritmo en la comparativa: permite estudiar el sistema cerca del punto crítico con un coste computacional muy inferior para los tamaños de red utilizados en este trabajo.
+
+\section{Observables medidos}
+
+Cada paso que toque medir, guardamos las siguientes cantidades usando la configuración instantánea del sistema:
+
+\begin{itemize}
+  \item La energía total del sistema, $E = \mathcal{H}$.
+  \item La magnetización por espín con signo, $m = \frac{1}{N}\sum_i \sigma_i$.
+  \item $m^2$ y $m^4$, necesarios para calcular $\chi$ y $U_4$.
+  \item El factor de estructura en el vector de onda mínimo, $\chi(k_{\min})$, necesario para calcular $\xi_L$.
+\end{itemize}
+
+Cuando todas las medidas a una temperatura dada son completadas, se calculan los valores medios de cada magnitud y esto es lo que se guarda. Luego, se hace un procesado de datos para generar los observables buscados y sus representaciones gráficas. Estos observables son los siguientes:
+
+La \textbf{magnetización media por espín} se define como $\langle |m| \rangle$, es decir, la media del valor absoluto de la magnetización por espín. En un sistema finito la simetría del hamiltoniano hace que la magnetización fluctúe de signo incluso por debajo de la temperatura crítica, por lo que $\langle m \rangle \approx 0$ y esto hace necesario el usar el valor absoluto para obtener un resultado que nos aporte información, obteniendo un valor no nulo para el parámetro de orden del sistema.
+
+La \textbf{capacidad calorífica} por espín la calculamos con las fluctuaciones en energía,
+\[
+C = \frac{\beta^2}{N}\left(\langle E^2 \rangle - \langle E \rangle^2\right),
+\]
+que es la expresión de la ecuación~\eqref{eq:Cv}. Es el estimador más eficiente para una simulación de Monte Carlo, ya que $\langle E^2 \rangle$ y $\langle E \rangle$ se acumulan en la misma pasada de medidas, sin ningún cálculo extra.
+
+La \textbf{susceptibilidad magnética} por espín la sacamos del estimador de fluctuaciones análogo,
+\[
+\chi = \frac{L^2}{T}\left(\langle m^2 \rangle - \langle |m| \rangle^2\right),
+\]
+donde hemos usado que $\beta = 1/T$ (con $k_B = 1$) y que $M = Nm$, por lo que $\chi = \beta(\langle M^2 \rangle - \langle |M| \rangle^2)/N = L^2(\langle m^2\rangle - \langle |m|\rangle^2)/T$. En la fase desordenada $\langle |m| \rangle \approx 0$, y la expresión se queda en $\chi = L^2 \langle m^2 \rangle / T$.
+
+El \textbf{cumulante de Binder} de cuarto orden lo calculamos como
+\[
+U_4 = 1 - \frac{\langle m^4 \rangle}{3\langle m^2 \rangle^2}.
+\]
+En la fase completamente ordenada ($T \to 0$), donde $|m| \to 1$ con fluctuaciones pequeñas, se tiene $\langle m^4 \rangle \approx \langle m^2 \rangle^2$ y $U_4 \to 2/3$. En la completamente desordenada ($T \to \infty$), donde $m$ sigue una gaussiana centrada en cero, $\langle m^4 \rangle = 3\langle m^2 \rangle^2$ y $U_4 \to 0$. El paso de un valor a otro, junto con el cruce de las curvas de distintos $L$ en $T_c$ que interpolamos usando splines, es lo que usamos para estimar la temperatura crítica con el cumulante de Binder de cuarto orden.
+
+La \textbf{longitud de correlación de segundo momento} $\xi_L$ la calculamos usando la ecuación~\eqref{eq:xi_def}, que necesita el factor de estructura en el vector de onda mínimo $\mathbf{k}_1 = (2\pi/L, 0)$. Este factor de estructura lo hemos calculado durante las simulaciones en Fortran como
+\[
+\chi(k_{\min}) = \frac{1}{N}\left\langle \left|\sum_j \sigma_j\, e^{i \mathbf{k}_1 \cdot \mathbf{r}_j}\right|^2 \right\rangle,
+\]
+donde la suma recorre todos los espines de la red. En la práctica, en cada medida acumulamos por separado la parte real y la imaginaria de $\sum_j \sigma_j e^{i\mathbf{k}_1\cdot\mathbf{r}_j}$, y al final promediamos el cuadrado del módulo y guardamos el resultado por espín.
+
+El \textbf{tiempo de autocorrelación integrado} $\tau_{\text{int}}$ lo calculamos para la serie temporal de la magnetización por espín $|m(t)|$, que es la magnitud más sensible a las correlaciones cerca de $T_c$ ya que es el parámetro de orden. Usamos el estimador de Madras y Sokal descrito en la sección~\ref{sec:csd} [ecuación~\eqref{eq:tau_int}], con la ventana $W$ fijada automáticamente como el primer instante en que $\rho(t) < e^{-t/\tau_{\text{int}}}$, y con $\tau_{\text{int}}$ calculado de forma iterativa. Conviene tener en cuenta que $\tau_{\text{int}}$ no es un observable de equilibrio en el mismo sentido que los anteriores, sino una propiedad de la dinámica del algoritmo, y por eso mantenemos su análisis separado del resto en el capítulo~\ref{chap:resultados}.
+
+\section{Análisis de escalado de tamaño finito}
+
+De entrada, se busca estimar $T_c$ a partir de los cruces del cumulante de Binder. Para ello, empezamos interpolando la serie de datos de cada $L$ usando splines. Con estos se buscan los cruces dos a dos entre un tamaño y el siguiente, y se representan las temperaturas a las que se encuentran estos cruces frente a $1/L^2$. De aquí, se hace un ajuste lineal, el cual debería cortar el eje de ordenadas a la temperatura $T_c$. De aquí obtenemos el resultado presentado, habiendo intentado disminuir los efectos de escala finita.
+
+Para el análisis usando el colapso de los datos partimos del valor exacto de Onsager $T_c = 2{,}2692$ como temperatura crítica de referencia y de los exponentes exactos de la clase de universalidad del modelo de Ising bidimensional: $\nu = 1$, $\gamma/\nu = 7/4$ y $\beta/\nu = 1/8$. Tomamos el valor de referencia, y lo que se hace es tomar la función universal de la susceptibilidad y de la longitud de correlación, representar todos los tamaños juntos e ir ajustando los exponentes hasta que de manera visual se aprecie el colapso de los datos sobre una única curva de manera aproximada. 
+
+Trabajamos con la temperatura reducida $t = (T - T_c)/T_c$ y con la variable de escala $x = t\,L^{1/\nu} = (T - T_c)L/T_c$ (con $\nu = 1$). Buscamos obtener el colapso de la susceptibilidad representando $\chi L^{-\gamma/\nu} = \chi L^{-7/4}$ frente a $x$: según la ecuación~\eqref{eq:fss_chi2}, todas las curvas de distinto $L$ deberían colapsar. Hacemos lo mismo con $\xi_L/L$ frente a $x$, que por la ecuación~\eqref{eq:fss_xi2} también debería colapsar sobre una función universal. En los dos casos miramos el colapso de forma visual, ya que evaluarlo de forma cuantitativa nos obligaría a tener un modelo para la función de escala $\tilde{\chi}(x)$, y eso se sale de lo que pretendemos en este trabajo. Con esta definición, además, la ventana fina de la malla de temperaturas, $[T_c - T_c/L,\, T_c + 3\,T_c/L]$, cae justo en el intervalo fijo $x \in [-1, 3]$, obteniendo el mismo rango para todos los tamaños con la misma densidad de puntos.

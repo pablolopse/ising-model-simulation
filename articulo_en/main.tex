@@ -1,0 +1,156 @@
+\documentclass[12pt]{report}
+\usepackage{graphicx} % Required for inserting images
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage{gensymb}
+\usepackage[top=2cm, bottom=2cm, left=2.5cm, right=2.5cm]{geometry}
+\usepackage{setspace}
+\usepackage{textcomp}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{svg}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage[skip=5pt plus1pt, indent=0em]{parskip}
+\usepackage{subfiles} % Best loaded last in the preamble
+\usepackage{fancyhdr}
+\usepackage{natbib}
+\definecolor{bgblue}{RGB}{245,243,253}
+\definecolor{ttblue}{RGB}{91,194,224}
+\newcommand{\itembf}[1]{\item \textbf{#1:}}
+\newcommand{\lt}{\ensuremath <}
+\newcommand{\gt}{\ensuremath >}
+\newcommand{\formula}[2]{\textbf{#1}: $#2$;\quad}
+\newcommand{\blankpage}{
+    \newpage
+    \thispagestyle{empty}
+    \mbox{}
+    \newpage
+}
+\geometry{a4paper}
+\singlespacing
+\bibliographystyle{apalike-es}
+\begin{document}
+% ======================= PRIMERA PORTADA =======================
+\begin{titlepage}
+    \centering
+    % Encabezado superior
+    {\bfseries\LARGE Universidad de Salamanca\par}
+    {\bfseries\LARGE Degree in Physics\par}
+  
+    \vspace{0.5cm}
+    
+    % Logo debajo del nombre de la asignatura
+    \includegraphics[width=0.6\textwidth]{USAL-Logo.jpg}\par
+    {\huge 4th YEAR PHYSICS\par}
+    \vspace{1cm}
+    \hrule
+    \vspace{0.8cm}
+    {\bfseries\huge FINAL DEGREE PROJECT IN PHYSICS\par}
+    \vspace{0.8cm}
+    \hrule
+    \vspace{1cm}
+    
+    \begin{center}
+        % Título principal
+        {\Huge\bfseries Monte Carlo simulation algorithms for the Ising model} \\[1cm]
+        % Subtítulo
+        %{\LARGE\bfseries Fenómenos de superficie} \\[1.5cm]
+    \end{center}
+    
+    \vfill
+    \begin{minipage}[b]{0.7\textwidth}
+        \centering
+        {\LARGE Pablo López Serna\par}
+        {\Large Supervisor: Antonio González Sánchez\par}
+        \vspace{0.5cm}
+        {\LARGE Academic year 2025/2026\par}
+    \end{minipage}%
+\end{titlepage}
+% ======================= SEGUNDA PORTADA (con firma) =======================
+\begin{titlepage}
+    \centering
+    % Encabezado superior
+    {\bfseries\LARGE Universidad de Salamanca\par}
+    {\bfseries\LARGE Degree in Physics\par}
+    \vspace{0.5cm}
+    % Logo debajo del nombre de la asignatura
+    \includegraphics[width=0.6\textwidth]{USAL-Logo.jpg}\par
+    {\huge 4th YEAR PHYSICS\par}
+    \vspace{1cm}
+    \hrule
+    \vspace{0.8cm}
+    {\bfseries\huge FINAL DEGREE PROJECT IN PHYSICS\par}
+    \vspace{0.8cm}
+    \hrule
+    \vspace{1cm}
+    \begin{center}
+        % Título principal
+        {\Huge\bfseries Monte Carlo simulation algorithms for the Ising model} \\[1cm]
+    \end{center}
+    \vfill
+    \begin{minipage}[b]{0.7\textwidth}
+        \centering
+        {\LARGE Pablo López Serna\par}
+        {\Large Supervisor: Antonio González Sánchez\par}
+        \vspace{0.5cm}
+        {\LARGE Academic year 2025/2026\par}
+        \vspace{1.5cm}
+        % --- Hueco para la firma del autor ---
+        {\large Author's signature:\par}
+        \vspace{2cm}                 % espacio para firmar
+        \rule{6cm}{0.4pt}\par
+        \vspace{0.2cm}
+        {\large Signed: Pablo López Serna\par}
+    \end{minipage}%
+\end{titlepage}
+\thispagestyle{empty}
+\subfile{01-resumen}
+\thispagestyle{empty}
+\newpage
+\thispagestyle{empty}
+\tableofcontents
+\thispagestyle{empty}
+\newpage
+\setcounter{page}{1}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[L]{\thepage}
+\fancyfoot[R]{\thesection\ \nouppercase{\leftmark}: \nouppercase{\rightmark}}
+\renewcommand{\footrulewidth}{0.4pt}
+\renewcommand{\headrulewidth}{0pt}
+% \leftmark = nombre del capítulo, \rightmark = nombre de la sección
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\renewcommand{\sectionmark}[1]{\markright{#1}}
+
+% Estilo de pie con SOLO el número de página (conclusiones y bibliografía)
+\fancypagestyle{solonumero}{%
+  \fancyhf{}%
+  \fancyfoot[L]{\thepage}%
+  \renewcommand{\footrulewidth}{0.4pt}%
+  \renewcommand{\headrulewidth}{0pt}%
+}
+
+\color{black} 
+\subfile{02-introduccion}
+\subfile{03-teoria}
+\subfile{04-metodos}
+\subfile{05-resultados}
+
+% A partir de aquí, el pie muestra solo el número de página
+\clearpage
+\pagestyle{solonumero}
+\subfile{06-conclusiones}
+\thispagestyle{plain}
+% --- Bibliografía SIN número de página ---
+\clearpage
+\fancypagestyle{plain}{%   % primera página de la bibliografía (la fuerza \chapter*)
+  \fancyhf{}%
+  \renewcommand{\footrulewidth}{0pt}%
+  \renewcommand{\headrulewidth}{0pt}%
+}
+\pagestyle{empty}          % resto de páginas de la bibliografía
+\bibliography{referencias}
+\end{document}

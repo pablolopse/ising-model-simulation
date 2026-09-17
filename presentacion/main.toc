@@ -1,0 +1,8 @@
+\babel@toc {spanish}{}\relax 
+\beamer@sectionintoc {1}{Introducción y motivación}{3}{0}{1}
+\beamer@sectionintoc {2}{Fundamentos teóricos}{6}{0}{2}
+\beamer@sectionintoc {3}{Algoritmos Montecarlo}{11}{0}{3}
+\beamer@sectionintoc {4}{Configuración de la simulación}{16}{0}{4}
+\beamer@sectionintoc {5}{Resultados}{18}{0}{5}
+\beamer@sectionintoc {6}{Comparativa dinámica}{46}{0}{6}
+\beamer@sectionintoc {7}{Conclusiones}{51}{0}{7}

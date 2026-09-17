@@ -1,0 +1,15 @@
+{
+  "Metropolis": {
+    "Tc_extrapolated_Linfty": 2.27259,
+    "Tc_mean_all_pairs": 2.27007
+  },
+  "Glauber": {
+    "Tc_extrapolated_Linfty": 2.26932,
+    "Tc_mean_all_pairs": 2.26995
+  },
+  "Wolff": {
+    "Tc_extrapolated_Linfty": 2.27196,
+    "Tc_mean_all_pairs": 2.27437
+  },
+  "Onsager_exact": 2.2691853
+}
